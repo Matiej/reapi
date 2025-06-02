@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: @project.name@
+  output:
+    ansi:
+      enabled: always
+app:
+  version: @project.version@
+  name: @project.name@
+
+server:
+  port: 8100

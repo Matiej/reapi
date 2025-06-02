@@ -1,0 +1,29 @@
+package com.emat.reapi.api;
+
+import com.emat.reapi.api.dto.GiosStationsDto;
+import com.emat.reapi.gios.domain.GiosStations;
+import com.emat.reapi.gios.port.GiosService;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
+
+@RestController
+@RequestMapping("/gios")
+@Slf4j
+@AllArgsConstructor
+public class GiosController {
+    private final GiosService giosService;
+
+    @GetMapping("/stations")
+    ResponseEntity<Mono<GiosStationsDto>> getAllStations() {
+        log.info("GET /gios/stations called");
+        Mono<GiosStationsDto> allStations = giosService.findAllStations().map(GiosStations::toDto);
+        return ResponseEntity
+                .status(200)
+                .body(allStations);
+    }
+}

@@ -4,6 +4,13 @@ spring:
   output:
     ansi:
       enabled: always
+  data:
+    mongodb:
+      host: localhost
+      port: 27018
+      database: reapi_mongo_db
+      auto-index-creation: true
+
 app:
   version: @project.version@
   name: @project.name@

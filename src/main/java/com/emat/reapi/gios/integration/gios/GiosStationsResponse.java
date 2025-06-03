@@ -1,6 +1,7 @@
 package com.emat.reapi.gios.integration.gios;
 
 import com.emat.reapi.gios.domain.GiosStations;
+import com.emat.reapi.gios.domain.Station;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -20,7 +21,7 @@ public class GiosStationsResponse {
 
     public GiosStations toDomain() {
         var stations = stationsResponse.stream()
-                .map(station -> new GiosStations.Station(
+                .map(station -> new Station(
                         station.id,
                         station.code,
                         station.name,
@@ -37,12 +38,12 @@ public class GiosStationsResponse {
     }
 
     public static record StationResponse(
-            @JsonProperty("Identyfikator stacji") Long id,
+            @JsonProperty("Identyfikator stacji") String id,
             @JsonProperty("Kod stacji") String code,
             @JsonProperty("Nazwa stacji") String name,
             @JsonProperty("WGS84 φ N") String latitude,
             @JsonProperty("WGS84 λ E") String longitude,
-            @JsonProperty("Identyfikator miasta") Long cityId,
+            @JsonProperty("Identyfikator miasta") String cityId,
             @JsonProperty("Nazwa miasta") String city,
             @JsonProperty("Gmina") String commune,
             @JsonProperty("Powiat") String district,

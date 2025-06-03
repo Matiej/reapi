@@ -1,12 +1,12 @@
 package com.emat.reapi.api.dto;
 
 public record StationDto(
-        Long id,
+        String stationId,
         String code,
         String name,
         String latitude,
         String longitude,
-        Long cityId,
+        String cityId,
         String city,
         String commune,
         String district,

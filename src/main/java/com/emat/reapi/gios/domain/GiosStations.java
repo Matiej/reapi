@@ -16,33 +16,18 @@ public class GiosStations {
     public GiosStationsDto toDto() {
         var stationsDto = stationList.stream()
                 .map(station -> new StationDto(
-                        station.id,
-                        station.code,
-                        station.name,
-                        station.latitude,
-                        station.longitude,
-                        station.cityId,
-                        station.city,
-                        station.commune,
-                        station.district,
-                        station.voivodeship,
-                        station.street
+                        station.getStationId(),
+                        station.getCode(),
+                        station.getName(),
+                        station.getLatitude(),
+                        station.getLongitude(),
+                        station.getCityId(),
+                        station.getCity(),
+                        station.getCommune(),
+                        station.getDistrict(),
+                        station.getVoivodeship(),
+                        station.getStreet()
                 )).toList();
         return new GiosStationsDto(numberOfStations, stationsDto);
-    }
-
-    public static record Station(
-            Long id,
-            String code,
-            String name,
-            String latitude,
-            String longitude,
-            Long cityId,
-            String city,
-            String commune,
-            String district,
-            String voivodeship,
-            String street
-    ) {
     }
 }

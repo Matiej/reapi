@@ -18,10 +18,10 @@ import reactor.core.publisher.Mono;
 public class GiosController {
     private final GiosService giosService;
 
-    @GetMapping("/stations")
-    ResponseEntity<Mono<GiosStationsDto>> getAllStations() {
+    @GetMapping("/stations/synchronise")
+    ResponseEntity<Mono<GiosStationsDto>> synchroniseStations() {
         log.info("GET /gios/stations called");
-        Mono<GiosStationsDto> allStations = giosService.findAllStations().map(GiosStations::toDto);
+        Mono<GiosStationsDto> allStations = giosService.synchronizeStations().map(GiosStations::toDto);
         return ResponseEntity
                 .status(200)
                 .body(allStations);

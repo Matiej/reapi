@@ -4,5 +4,5 @@ import com.emat.reapi.gios.domain.GiosStations;
 import reactor.core.publisher.Mono;
 
 public interface GiosService {
-    Mono<GiosStations> findAllStations();
+    Mono<GiosStations> synchronizeStations();
 }

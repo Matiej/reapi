@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class GiosClient {
     private static final String GET_ALL_STATIONS_URI = "/v1/rest/station/findAll";
+    private static final String AQ_INDEX_URI = "/v1/rest/aqindex/getIndex/{stationId}";
     private static final String MAX_STATIONS_SIZE = "500";
     private final WebClient giosWebClient;
 
@@ -26,6 +27,19 @@ public class GiosClient {
                 .retrieve()
                 .bodyToMono(GiosStationsResponse.class)
                 .doOnNext(sub -> log.info("Calling GIOS: {}", GET_ALL_STATIONS_URI))
+                .doOnError(e -> log.error("Error calling GIOS API", e));
+    }
+
+    public Mono<GiosAqIndexResponse> getAqIndex(String stationId) {
+        return giosWebClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(AQ_INDEX_URI)
+                        .build(stationId)
+                )
+                .retrieve()
+                .bodyToMono(GiosAqIndexResponse.class)
+                .doOnNext(response -> log.info("Calligion GIOS aqindex: {}", AQ_INDEX_URI))
                 .doOnError(e -> log.error("Error calling GIOS API", e));
     }
 }

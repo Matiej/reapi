@@ -1,12 +1,13 @@
 package com.emat.reapi.gios.port;
 
+import com.emat.reapi.gios.domain.GiosAqIndex;
 import com.emat.reapi.gios.domain.GiosStations;
 import com.emat.reapi.gios.domain.Station;
 import com.emat.reapi.gios.infra.StationDocument;
 import com.emat.reapi.gios.infra.StationRepository;
+import com.emat.reapi.gios.integration.gios.GiosAqIndexResponse;
 import com.emat.reapi.gios.integration.gios.GiosClient;
 import com.emat.reapi.gios.integration.gios.GiosStationsResponse;
-import com.mongodb.DuplicateKeyException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,14 @@ class GiosServiceImpl implements GiosService {
                                 )
                                 .thenReturn(stations));
     }
+
+    @Override
+    public Mono<GiosAqIndex> getAqIndex(String stationId) {
+        return   giosClient.getAqIndex(stationId)
+                .map(GiosAqIndexResponse::toDomain)
+                .doOnNext(r -> log.info("Received aqIndex for station {}", stationId));
+    }
+
 
     private Mono<Void> updateExistingStations(List<Station> stationList) {
         return Flux.fromIterable(stationList)

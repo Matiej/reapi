@@ -23,7 +23,7 @@ public class GiosController {
 
     @GetMapping("/stations/synchronise")
     ResponseEntity<Mono<GiosStationsDto>> synchroniseStations() {
-        log.info("GET /gios/stations called");
+        log.info("GET /gios/stations/synchronise");
         Mono<GiosStationsDto> allStations = giosService.synchronizeStations().map(GiosStations::toDto);
         return ResponseEntity
                 .status(200)

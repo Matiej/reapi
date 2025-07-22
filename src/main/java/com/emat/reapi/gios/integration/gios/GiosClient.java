@@ -39,7 +39,7 @@ public class GiosClient {
                 )
                 .retrieve()
                 .bodyToMono(GiosAqIndexResponse.class)
-                .doOnNext(response -> log.info("Calligion GIOS aqindex: {}", AQ_INDEX_URI))
+                .doOnNext(response -> log.info("Calling on GIOS aqindex: {}", AQ_INDEX_URI))
                 .doOnError(e -> log.error("Error calling GIOS API", e));
     }
 }

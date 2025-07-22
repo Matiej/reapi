@@ -2,6 +2,7 @@ package com.emat.reapi.api.dto;
 
 public record AqIndexDto(
         String id,
+        String savingDate,
         String stationId,
         String calculationDate,
         int indexValue,

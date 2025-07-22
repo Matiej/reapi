@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class AqIndexDocument {
     @Id
     private String id;
+    private String savingDate;
     private String stationId;
     private String calculationDate;
     private int indexValue;
@@ -43,8 +44,9 @@ public class AqIndexDocument {
     private boolean stationIndexStatus;
     private String criticalPollutantCode;
 
-    public AqIndexDocument(String stationId, String calculationDate, int indexValue, String indexCategory, String sourceDataDate, String so2CalculationDate, Integer so2IndexValue, String so2IndexCategory, String so2SourceDataDate, String no2CalculationDate, Integer no2IndexValue, String no2IndexCategory, String no2SourceDataDate, String pm10CalculationDate, Integer pm10IndexValue, String pm10IndexCategory, String pm10SourceDataDate, String pm25CalculationDate, Integer pm25IndexValue, String pm25IndexCategory, String pm25SourceDataDate, String o3CalculationDate, Integer o3IndexValue, String o3IndexCategory, String o3SourceDataDate, boolean stationIndexStatus, String criticalPollutantCode) {
+    public AqIndexDocument(String stationId, String savingDate, String calculationDate, int indexValue, String indexCategory, String sourceDataDate, String so2CalculationDate, Integer so2IndexValue, String so2IndexCategory, String so2SourceDataDate, String no2CalculationDate, Integer no2IndexValue, String no2IndexCategory, String no2SourceDataDate, String pm10CalculationDate, Integer pm10IndexValue, String pm10IndexCategory, String pm10SourceDataDate, String pm25CalculationDate, Integer pm25IndexValue, String pm25IndexCategory, String pm25SourceDataDate, String o3CalculationDate, Integer o3IndexValue, String o3IndexCategory, String o3SourceDataDate, boolean stationIndexStatus, String criticalPollutantCode) {
         this.stationId = stationId;
+        this.savingDate = savingDate;
         this.calculationDate = calculationDate;
         this.indexValue = indexValue;
         this.indexCategory = indexCategory;
@@ -76,6 +78,7 @@ public class AqIndexDocument {
     public AqIndexDto toDto() {
         return new AqIndexDto(
                 this.id,
+                this.savingDate,
                 this.stationId,
                 this.calculationDate,
                 this.indexValue,

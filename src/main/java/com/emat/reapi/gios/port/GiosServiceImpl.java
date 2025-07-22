@@ -55,8 +55,12 @@ class GiosServiceImpl implements GiosService {
                 .flatMapMany(Flux::fromIterable)
                 .flatMap(station -> getAqIndex(station.getStationId())
                         .map(GiosAqIndex::toDocument)
+                        .filter(aq -> aq.getStationId() != null)
+                        .doOnNext(aq -> log.info("Saving AQ index for stationId={}, ", aq.getStationId()))
                         .flatMap(aqIndexRepository::save)
-                        .doOnNext(saved -> log.info("Saved AQ index for stationId={}", saved.getStationId()))
+                        .doOnNext(saved ->
+                                log.info("Saved AQ index for stationId={}", saved.getStationId())
+                        )
                 );
 
     }

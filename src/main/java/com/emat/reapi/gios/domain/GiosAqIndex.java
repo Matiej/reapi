@@ -5,6 +5,9 @@ import com.emat.reapi.gios.infra.AqIndexDocument;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 @Data
 @AllArgsConstructor
 public class GiosAqIndex {
@@ -71,6 +74,7 @@ public class GiosAqIndex {
     public AqIndexDocument toDocument() {
         return new AqIndexDocument(
                 stationId,
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
                 calculationDate,
                 indexValue,
                 indexCategory,

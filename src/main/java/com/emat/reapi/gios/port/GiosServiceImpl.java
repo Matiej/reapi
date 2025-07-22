@@ -3,6 +3,8 @@ package com.emat.reapi.gios.port;
 import com.emat.reapi.gios.domain.GiosAqIndex;
 import com.emat.reapi.gios.domain.GiosStations;
 import com.emat.reapi.gios.domain.Station;
+import com.emat.reapi.gios.infra.AqIndexDocument;
+import com.emat.reapi.gios.infra.AqIndexRepository;
 import com.emat.reapi.gios.infra.StationDocument;
 import com.emat.reapi.gios.infra.StationRepository;
 import com.emat.reapi.gios.integration.gios.GiosAqIndexResponse;
@@ -15,14 +17,14 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 class GiosServiceImpl implements GiosService {
     private final GiosClient giosClient;
-    private final StationRepository repository;
+    private final StationRepository stationRepository;
+    private final AqIndexRepository aqIndexRepository;
 
     @Override
     public Mono<GiosStations> synchronizeStations() {
@@ -40,9 +42,23 @@ class GiosServiceImpl implements GiosService {
 
     @Override
     public Mono<GiosAqIndex> getAqIndex(String stationId) {
-        return   giosClient.getAqIndex(stationId)
+        return giosClient.getAqIndex(stationId)
                 .map(GiosAqIndexResponse::toDomain)
                 .doOnNext(r -> log.info("Received aqIndex for station {}", stationId));
+    }
+
+    @Override
+    public Flux<AqIndexDocument> saveMeasurementsForAllStations() {
+        return synchronizeStations()
+                .doOnNext(r -> log.info("Saving measurements for stations: {}", r.getNumberOfStations()))
+                .map(GiosStations::getStationList)
+                .flatMapMany(Flux::fromIterable)
+                .flatMap(station -> getAqIndex(station.getStationId())
+                        .map(GiosAqIndex::toDocument)
+                        .flatMap(aqIndexRepository::save)
+                        .doOnNext(saved -> log.info("Saved AQ index for stationId={}", saved.getStationId()))
+                );
+
     }
 
 
@@ -50,13 +66,13 @@ class GiosServiceImpl implements GiosService {
         return Flux.fromIterable(stationList)
                 .flatMap(station -> {
                     StationDocument newStationDocument = station.toDocument();
-                    return repository.findByStationId(newStationDocument.getStationId())
+                    return stationRepository.findByStationId(newStationDocument.getStationId())
                             .flatMap(existingStationDocument -> {
                                 if (existingStationDocument.equals(newStationDocument)) {
                                     return Mono.empty();
                                 }
                                 newStationDocument.setId(existingStationDocument.getId());
-                                return repository.save(newStationDocument);
+                                return stationRepository.save(newStationDocument);
                             })
                             .doOnNext(saved -> {
                                 log.info("Updating station id:{}", saved.getStationId());
@@ -66,12 +82,11 @@ class GiosServiceImpl implements GiosService {
     }
 
     private Mono<Void> saveNewStations(List<Station> stationList) {
-        AtomicInteger newStationsCounter = new AtomicInteger(0);
         return Flux.fromIterable(stationList)
                 .flatMap(station -> {
                     StationDocument newStationDocument = station.toDocument();
-                    return repository.findByStationId(newStationDocument.getStationId())
-                            .switchIfEmpty(repository.save(newStationDocument)
+                    return stationRepository.findByStationId(newStationDocument.getStationId())
+                            .switchIfEmpty(stationRepository.save(newStationDocument)
                                     .doOnSuccess(saved -> {
                                         log.info("Saved station id: {}", saved.getStationId());
 

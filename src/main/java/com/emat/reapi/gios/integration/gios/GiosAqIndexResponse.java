@@ -14,7 +14,7 @@ public class GiosAqIndexResponse {
     }
 
     public record AqIndexResponse(
-            @JsonProperty("Identyfikator stacji pomiarowej") int stationId,
+            @JsonProperty("Identyfikator stacji pomiarowej") String stationId,
             @JsonProperty("Data wykonania obliczeń indeksu") String calculationDate,
             @JsonProperty("Wartość indeksu") int indexValue,
             @JsonProperty("Nazwa kategorii indeksu") String indexCategory,

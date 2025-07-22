@@ -36,6 +36,7 @@ public class GiosController {
     @GetMapping("/aqindex/synchronise")
     @ResponseStatus(HttpStatus.OK)
     Flux<AqIndexDto> synchroniseAqIndex() {
+        log.info("GET /aqindex/synchronise called");
         return giosService.saveMeasurementsForAllStations().map(AqIndexDocument::toDto);
     }
 }

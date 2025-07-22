@@ -15,7 +15,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class AqIndexDocument {
     @Id
     private String id;
-    @Indexed(unique = true)
     private String stationId;
     private String calculationDate;
     private int indexValue;

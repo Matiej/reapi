@@ -10,6 +10,20 @@ spring:
       port: 27018
       database: reapi_mongo_db
       auto-index-creation: true
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      base-url: https://api.openai.com/
+  logging:
+    level:
+    com.emat.reapi.ai.configuration: DEBUG
+    org.springframework.web.reactive.function.client: TRACE
+    org.springframework.web.client.RestClient: TRACE
+    org.springframework.http.client: TRACE
+
+springdoc:
+  swagger-ui:
+    path: /docs
 
 app:
   version: @project.version@

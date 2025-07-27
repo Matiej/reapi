@@ -1,6 +1,5 @@
 package com.emat.reapi.api;
 
-import com.emat.reapi.ai.DirectTestService;
 import com.emat.reapi.ai.SpeechFileValidator;
 import com.emat.reapi.ai.port.ReApiTtsService;
 import com.emat.reapi.api.dto.TtsResponse;
@@ -180,15 +179,6 @@ public class TtsController {
                         .body(audioBytes);
             });
         }).flatMap(mono -> mono);
-    }
-
-    @GetMapping("/test-direct")
-    public Mono<ResponseEntity<byte[]>> testDirect() {
-        return directTestService.generate("Hello", "nova", "mp3", "tts-1")
-                .map(bytes -> ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=speech.mp3")
-                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                        .body(bytes));
     }
 
     private AudioResponseFormat mapFormat(String format) {

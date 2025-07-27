@@ -32,7 +32,6 @@ import reactor.core.publisher.Mono;
 public class TtsController {
     private final ReApiTtsService ttsService;
     private final SpeechFileValidator speechFileValidator;
-    private final DirectTestService directTestService;
 
     @Operation(
             summary = "Generate speech from text",

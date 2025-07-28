@@ -5,7 +5,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class VoiceConverter implements Converter<String, OpenAiAudioApi.SpeechRequest.Voice> {
+public class VoiceEnumVariableConverter implements Converter<String, OpenAiAudioApi.SpeechRequest.Voice> {
     @Override
     public OpenAiAudioApi.SpeechRequest.Voice convert(String source) {
         for (OpenAiAudioApi.SpeechRequest.Voice voice : OpenAiAudioApi.SpeechRequest.Voice.values()) {

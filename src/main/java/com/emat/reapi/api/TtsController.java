@@ -1,7 +1,8 @@
 package com.emat.reapi.api;
 
-import com.emat.reapi.ai.SpeechFileValidator;
+import com.emat.reapi.ai.TtsRequest;
 import com.emat.reapi.ai.port.ReApiTtsService;
+import com.emat.reapi.ai.validator.TextFileValidatorFactory;
 import com.emat.reapi.api.dto.TtsResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,7 +32,7 @@ import reactor.core.publisher.Mono;
 @Validated
 public class TtsController {
     private final ReApiTtsService ttsService;
-    private final SpeechFileValidator speechFileValidator;
+    private final TextFileValidatorFactory speechFileValidator;
 
     @Operation(
             summary = "Generate speech from text",
@@ -85,9 +86,8 @@ public class TtsController {
     ) {
         boolean hd = Boolean.parseBoolean(hdRaw);
         AudioResponseFormat audioFormat = mapFormat(format);
-        Mono<byte[]> audioMono = hd
-                ? ttsService.generateProSpeech(text, voice, audioFormat)
-                : ttsService.generateBasicSpeech(text, voice, audioFormat);
+
+        Mono<byte[]> audioMono = ttsService.generateSpeech(new TtsRequest(text, hd, voice, audioFormat));
 
         return audioMono.map(audioBytes -> {
             String fileName = "speech." + format;
@@ -102,10 +102,10 @@ public class TtsController {
     @Operation(
             summary = "Generate speech from uploaded .txt file",
             description = """
-        Converts uploaded `.txt` file into speech using OpenAI's TTS model.
-        File must be of MIME type `text/plain` and contain no more than 4000 characters.
-        Returns audio file in selected format (e.g. mp3).
-        """,
+                    Converts uploaded `.txt` file into speech using OpenAI's TTS model.
+                    File must be of MIME type `text/plain` and contain no more than 4000 characters.
+                    Returns audio file in selected format (e.g. mp3).
+                    """,
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
                     content = @Content(
@@ -137,38 +137,34 @@ public class TtsController {
             @RequestParam(defaultValue = "nova")
             @Parameter(
                     description = """
-                    Voice used for synthesis.
-                    Recommended: `nova`, `shimmer`, `echo`, `onyx`.
-                    """,
+                            Voice used for synthesis.
+                            Recommended: `nova`, `shimmer`, `echo`, `onyx`.
+                            """,
                     example = "nova"
             )
             Voice voice,
             @RequestParam(defaultValue = "mp3")
             @Parameter(
                     description = """
-                    Audio output format.
-                    Supported: `mp3`, `opus`, `aac`, `flac`, `pcm`.
-                    """,
+                            Audio output format.
+                            Supported: `mp3`, `opus`, `aac`, `flac`, `pcm`.
+                            """,
                     schema = @Schema(allowableValues = {"mp3", "opus", "aac", "flac", "pcm"})
             )
             String format,
             @RequestParam(defaultValue = "false")
             @Parameter(
                     description = """
-                    Whether to use high-definition voice model.
-                    `false` → cheaper model (`tts-1`),
-                    `true` → higher quality model (`tts-1-hd`, more expensive).
-                    """
+                            Whether to use high-definition voice model.
+                            `false` → cheaper model (`tts-1`),
+                            `true` → higher quality model (`tts-1-hd`, more expensive).
+                            """
             )
             boolean hd
     ) {
         return Mono.fromCallable(() -> {
-            String text = speechFileValidator.validateAndExtractText(file);
-
             AudioResponseFormat audioFormat = mapFormat(format);
-            Mono<byte[]> audioMono = hd
-                    ? ttsService.generateProSpeech(text, voice, audioFormat)
-                    : ttsService.generateBasicSpeech(text, voice, audioFormat);
+            Mono<byte[]> audioMono = ttsService.generateSpeech(new TtsRequest(file, hd, voice, audioFormat));
 
             return audioMono.map(audioBytes -> {
                 String fileName = "speech." + format;

@@ -2,8 +2,6 @@ package com.emat.reapi.ai.port;
 
 import com.emat.reapi.ai.TtsRequest;
 import com.emat.reapi.ai.integration.OpenAiClientFactory;
-import com.emat.reapi.ai.validator.AbstractTextFileValidator;
-import com.emat.reapi.ai.validator.FileValidationType;
 import com.emat.reapi.ai.validator.TextFileValidatorFactory;
 import com.emat.reapi.ai.validator.TextValidator;
 import jakarta.validation.ValidationException;

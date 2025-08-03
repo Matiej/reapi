@@ -2,12 +2,10 @@ package com.emat.reapi.ai.port;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.ai.transformer.splitter.TextSplitter;
 
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class TextChunksSplitterTest {
     private TextChunksSplitter textSplitter;

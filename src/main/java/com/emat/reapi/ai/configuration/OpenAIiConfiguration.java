@@ -1,6 +1,9 @@
 package com.emat.reapi.ai.configuration;
 
+import com.emat.reapi.ai.integration.OpenAiClientFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.openai.OpenAiEmbeddingModel;
+import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,5 +50,11 @@ public class OpenAIiConfiguration {
     @Bean
     public RestClient.Builder openAiRestClientBuilder() {
         return RestClient.builder();
+    }
+
+    @Bean
+    public SimpleVectorStore simpleVectorStore(OpenAiClientFactory factory) {
+        OpenAiEmbeddingModel model = factory.createEmbeddingModel();
+        return SimpleVectorStore.builder(model).build();
     }
 }

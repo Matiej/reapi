@@ -8,4 +8,5 @@ public interface ReApiEmbeddingService {
     Mono<Void> indexText(MultipartFile file, EmbeddingMetaRequest request);
 
     Mono<Void> indexText(String text, EmbeddingMetaRequest request);
+
 }

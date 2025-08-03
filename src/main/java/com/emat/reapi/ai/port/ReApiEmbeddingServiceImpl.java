@@ -32,7 +32,7 @@ class ReApiEmbeddingServiceImpl implements ReApiEmbeddingService {
     private final TextValidator textVal;
     private final TextChunksSplitter textChunkSplitter;
     private final TextFileValidatorFactory fileValidatorFactory;
-
+    private final SimpleVectorStore vectorStore;
 
     private static final int CHUNK_SIZE = 2000;
 
@@ -67,7 +67,6 @@ class ReApiEmbeddingServiceImpl implements ReApiEmbeddingService {
 
     private void storeTextAsEmbeddings(String validatedText, EmbeddingMetaRequest request, String fileName) {
         OpenAiEmbeddingModel embeddingModel = openAiClientFactory.createEmbeddingModel();
-        var vectorStore = SimpleVectorStore.builder(embeddingModel).build();
 
         List<String> chunks = textChunkSplitter.splitBySentences(validatedText, CHUNK_SIZE);
         log.info("Text split into {} chunks (maxChunkSize={})", chunks.size(), CHUNK_SIZE);

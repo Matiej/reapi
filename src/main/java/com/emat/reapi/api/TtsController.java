@@ -25,7 +25,7 @@ import reactor.core.publisher.Mono;
 
 
 @RestController
-@RequestMapping("/ai/tts")
+@RequestMapping("reapi/tts")
 @Slf4j
 @AllArgsConstructor
 @Tag(name = "TTS", description = "Text-to-Speech generation with OpenAI")
@@ -84,6 +84,7 @@ public class TtsController {
             )
             @RequestParam(defaultValue = "false") String hdRaw
     ) {
+        log.info("received request: GET /reapi/tts/text");
         boolean hd = Boolean.parseBoolean(hdRaw);
         AudioResponseFormat audioFormat = mapFormat(format);
 
@@ -163,6 +164,7 @@ public class TtsController {
             boolean hd
     ) {
         return Mono.fromCallable(() -> {
+            log.info("received request: GET /reapi/tts/file");
             AudioResponseFormat audioFormat = mapFormat(format);
             Mono<byte[]> audioMono = ttsService.generateSpeech(new TtsRequest(file, hd, voice, audioFormat));
 

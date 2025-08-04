@@ -2,6 +2,7 @@ package com.emat.reapi.profiler.port;
 
 import com.emat.reapi.profiler.domain.ClientAnswer;
 import com.emat.reapi.profiler.domain.StatementDefinition;
+import com.emat.reapi.profiler.infra.ClientAnswerDocument;
 import com.emat.reapi.profiler.infra.ClientAnswerRepository;
 import com.emat.reapi.profiler.infra.StatementDefinitionDocument;
 import com.emat.reapi.profiler.infra.StatementDefinitionRepository;
@@ -20,7 +21,10 @@ public class ProfilerServiceImpl implements ProfilerService {
 
     @Override
     public Mono<Void> saveClientAnswers(ClientAnswer clientAnswer) {
-        return null;
+        log.info("Saving client answers for clientId: {}", clientAnswer.getClientId());
+        return clientAnswerRepository.save(ClientAnswerDocument.toDocument(clientAnswer))
+                .doOnSuccess(saved -> log.debug("Saved clients answers: {}", clientAnswer))
+                .then();
     }
 
     @Override

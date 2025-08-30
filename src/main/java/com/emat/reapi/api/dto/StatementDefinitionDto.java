@@ -2,23 +2,27 @@ package com.emat.reapi.api.dto;
 
 
 import com.emat.reapi.profiler.domain.StatementDefinition;
+import com.emat.reapi.profiler.domain.StatementCategory;
+import com.emat.reapi.profiler.domain.StatementTypeDefinition;
+
+import java.util.List;
 
 public record StatementDefinitionDto(
         String statementId,
-        String leftStatement,
-        String rightStatement,
-        String category
+        StatementCategory category,
+        String statementKey,
+        List<StatementTypeDefinition> statementTypeDefinitions
 ) {
     public static StatementDefinitionDto toDto(StatementDefinition domain) {
         return new StatementDefinitionDto(
                 domain.getStatementId(),
-                domain.getLeftStatement(),
-                domain.getRightStatement(),
-                domain.getCategory()
+                domain.getCategory(),
+                domain.getStatementKey(),
+                domain.getStatementTypeDefinitions()
         );
     }
 
     public StatementDefinition toDomain() {
-        return new StatementDefinition(statementId, leftStatement, rightStatement, category);
+        return new StatementDefinition(statementId, category, statementKey, statementTypeDefinitions);
     }
 }

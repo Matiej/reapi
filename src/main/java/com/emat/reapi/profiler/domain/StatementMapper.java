@@ -2,6 +2,7 @@ package com.emat.reapi.profiler.domain;
 
 import com.emat.reapi.api.dto.AnsweredStatementDto;
 import com.emat.reapi.api.dto.StatementDto;
+import com.emat.reapi.profiler.infra.StatementDefinitionsDictionary;
 
 import java.util.List;
 

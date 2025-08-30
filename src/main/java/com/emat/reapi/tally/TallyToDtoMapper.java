@@ -5,13 +5,10 @@ import com.emat.reapi.api.dto.ClientAnswerDto;
 import com.emat.reapi.api.dto.StatementDto;
 import com.emat.reapi.api.tally.TallyWebhookEvent;
 import com.emat.reapi.profiler.domain.StatementDefinition;
-import com.emat.reapi.profiler.domain.StatementDefinitionsDictionary;
+import com.emat.reapi.profiler.infra.StatementDefinitionsDictionary;
 import com.emat.reapi.profiler.domain.StatementTypeDefinition;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import java.text.Normalizer;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

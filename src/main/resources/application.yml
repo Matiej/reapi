@@ -31,3 +31,6 @@ app:
 
 server:
   port: 8100
+
+tally:
+  signing-secret: ${SIGNING_SECRET_KEY}

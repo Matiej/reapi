@@ -1,25 +1,28 @@
 package com.emat.reapi.api.dto;
 
-import com.emat.reapi.profiler.domain.AnsweredStatement;
 import com.emat.reapi.profiler.domain.ClientAnswer;
+import com.emat.reapi.profiler.domain.ClientStatement;
 
 import java.util.List;
 
 public record ClientAnswerDto(
         String clientId,
+        String submissionId,
+        String name,
+        String testName,
         List<AnsweredStatementDto>answeredStatementList
 ) {
     public ClientAnswer toDomain() {
-        List<AnsweredStatement> domainList = answeredStatementList.stream()
+        List<ClientStatement> domainList = answeredStatementList.stream()
                 .map(AnsweredStatementDto::toDomain)
                 .toList();
-        return new ClientAnswer(clientId, domainList);
+        return new ClientAnswer(clientId, submissionId, name, testName, domainList);
     }
 
-    public static ClientAnswerDto fromDomain(ClientAnswer domain) {
-        List<AnsweredStatementDto> dtoList = domain.getAnsweredStatementList().stream()
-                .map(AnsweredStatementDto::toDto)
-                .toList();
-        return new ClientAnswerDto(domain.getClientId(), dtoList);
-    }
+//    public static ClientAnswerDto toDto(ClientAnswer domain) {
+//        List<AnsweredStatementDto> dtoList = domain.getClientStatementList().stream()
+//                .map(AnsweredStatementDto::toDto)
+//                .toList();
+//        return new ClientAnswerDto(domain.getClientId(), domain.getName(), dtoList);
+//    }
 }

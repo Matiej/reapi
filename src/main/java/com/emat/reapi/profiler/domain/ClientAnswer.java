@@ -9,5 +9,8 @@ import java.util.List;
 @AllArgsConstructor
 public class ClientAnswer {
     private String clientId;
-    private List<AnsweredStatement> answeredStatementList;
+    private String submissionId;
+    private String name;
+    private String testName;
+    private List<ClientStatement> clientStatementList;
 }

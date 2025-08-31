@@ -2,7 +2,6 @@ package com.emat.reapi.api.dto;
 
 import com.emat.reapi.profiler.domain.ClientAnswer;
 import com.emat.reapi.profiler.domain.StatementMapper;
-import com.emat.reapi.profiler.infra.ClientAnswerDocument;
 
 import java.util.List;
 

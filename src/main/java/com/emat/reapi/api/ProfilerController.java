@@ -1,8 +1,6 @@
 package com.emat.reapi.api;
 
-import com.emat.reapi.api.dto.AnsweredStatementResponse;
 import com.emat.reapi.api.dto.ClientAnswerResponse;
-import com.emat.reapi.profiler.domain.StatementMapper;
 import com.emat.reapi.profiler.port.ProfilerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

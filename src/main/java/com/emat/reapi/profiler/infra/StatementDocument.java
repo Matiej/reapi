@@ -2,7 +2,6 @@ package com.emat.reapi.profiler.infra;
 
 import com.emat.reapi.profiler.domain.Statement;
 import com.emat.reapi.profiler.domain.StatementType;
-import jakarta.annotation.sql.DataSourceDefinitions;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

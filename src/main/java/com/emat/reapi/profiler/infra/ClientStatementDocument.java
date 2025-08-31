@@ -1,7 +1,6 @@
 package com.emat.reapi.profiler.infra;
 
 import com.emat.reapi.profiler.domain.ClientStatement;
-import com.emat.reapi.profiler.domain.Statement;
 import com.emat.reapi.profiler.domain.StatementCategory;
 import lombok.AllArgsConstructor;
 import lombok.Data;

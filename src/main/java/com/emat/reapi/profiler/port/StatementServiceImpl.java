@@ -1,8 +1,6 @@
 package com.emat.reapi.profiler.port;
 
-import com.emat.reapi.profiler.domain.ClientAnswer;
 import com.emat.reapi.profiler.domain.StatementDefinition;
-import com.emat.reapi.profiler.infra.ClientAnswerDocument;
 import com.emat.reapi.profiler.infra.ClientAnswerRepository;
 import com.emat.reapi.profiler.infra.StatementDefinitionDocument;
 import com.emat.reapi.profiler.infra.StatementDefinitionRepository;

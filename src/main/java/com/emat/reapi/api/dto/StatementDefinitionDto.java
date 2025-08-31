@@ -1,8 +1,8 @@
 package com.emat.reapi.api.dto;
 
 
-import com.emat.reapi.profiler.domain.StatementDefinition;
 import com.emat.reapi.profiler.domain.StatementCategory;
+import com.emat.reapi.profiler.domain.StatementDefinition;
 import com.emat.reapi.profiler.domain.StatementTypeDefinition;
 
 import java.util.List;

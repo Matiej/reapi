@@ -7,6 +7,6 @@ public record StatementResponse (
         String statementKey,
         String statementDescription,
         Boolean status,
-        StatementType statementType
+        String statementType
 ) {
 }

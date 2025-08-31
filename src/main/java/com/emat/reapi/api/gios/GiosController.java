@@ -1,8 +1,5 @@
-package com.emat.reapi.api;
+package com.emat.reapi.api.gios;
 
-import com.emat.reapi.api.dto.AqIndexDto;
-import com.emat.reapi.api.dto.GiosAqIndexDto;
-import com.emat.reapi.api.dto.GiosStationsDto;
 import com.emat.reapi.gios.domain.GiosAqIndex;
 import com.emat.reapi.gios.domain.GiosStations;
 import com.emat.reapi.gios.infra.AqIndexDocument;

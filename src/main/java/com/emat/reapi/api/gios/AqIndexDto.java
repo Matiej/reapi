@@ -1,6 +1,8 @@
-package com.emat.reapi.api.dto;
+package com.emat.reapi.api.gios;
 
-public record GiosAqIndexDto(
+public record AqIndexDto(
+        String id,
+        String savingDate,
         String stationId,
         String calculationDate,
         int indexValue,
@@ -28,5 +30,5 @@ public record GiosAqIndexDto(
         String o3SourceDataDate,
         boolean stationIndexStatus,
         String criticalPollutantCode
-) {}
-
+) {
+}

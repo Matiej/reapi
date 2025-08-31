@@ -15,7 +15,7 @@ import java.util.List;
 public class ClientStatementDocument {
     private String statementId;
     private String key;
-    private List<Statement> statements;
+    private List<StatementDocument> statements;
     private StatementCategory statementCategory;
 
     public static List<ClientStatementDocument> toDocumentList(List<ClientStatement> clientStatementList) {
@@ -26,7 +26,7 @@ public class ClientStatementDocument {
         return new ClientStatementDocument(
                 domain.getStatementId(),
                 domain.getKey(),
-                domain.getStatementList(),
+                domain.getStatementList().stream().map(StatementDocument::toDocument).toList(),
                 domain.getStatementCategory());
     }
 
@@ -34,7 +34,7 @@ public class ClientStatementDocument {
         return new ClientStatement(
                 statementId,
                 key,
-                statements,
+                statements.stream().map(StatementDocument::toDomain).toList(),
                 statementCategory
         );
     }

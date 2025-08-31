@@ -1,7 +1,7 @@
 package com.emat.reapi.gios.domain;
 
-import com.emat.reapi.api.dto.GiosStationsDto;
-import com.emat.reapi.api.dto.StationDto;
+import com.emat.reapi.api.gios.GiosStationsDto;
+import com.emat.reapi.api.gios.StationDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

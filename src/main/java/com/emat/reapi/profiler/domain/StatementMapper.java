@@ -1,8 +1,12 @@
 package com.emat.reapi.profiler.domain;
 
 import com.emat.reapi.api.dto.AnsweredStatementDto;
+import com.emat.reapi.api.dto.AnsweredStatementResponse;
 import com.emat.reapi.api.dto.StatementDto;
+import com.emat.reapi.api.dto.StatementResponse;
+import com.emat.reapi.profiler.infra.ClientStatementDocument;
 import com.emat.reapi.profiler.infra.StatementDefinitionsDictionary;
+import com.emat.reapi.profiler.infra.StatementDocument;
 
 import java.util.List;
 
@@ -18,6 +22,23 @@ public final class StatementMapper {
                 def.getStatementKey(),
                 toStatements(def.getStatementTypeDefinitions(), dto.getStatementDtoList()),
                 def.getCategory()
+        );
+    }
+
+    public static AnsweredStatementResponse toAnsweredStatementResponse(ClientStatement clientStatement) {
+        return new AnsweredStatementResponse(
+                clientStatement.getStatementId(),
+                clientStatement.getKey(),
+                clientStatement.getStatementList().stream().map(StatementMapper::toStatementResponseDto).toList()
+        );
+    }
+
+    private static StatementResponse toStatementResponseDto(Statement statement) {
+        return new StatementResponse(
+                statement.getStatementKey(),
+                statement.getStatementDescription(),
+                statement.getStatementStatus(),
+                statement.getStatementType()
         );
     }
 

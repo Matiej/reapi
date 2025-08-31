@@ -23,4 +23,6 @@ public class AnsweredStatementDto {
     public ClientStatement toDomain() {
         return StatementMapper.toDomain(this);
     }
+
+
 }

@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -20,15 +21,18 @@ import java.util.List;
 @Document("client_answer")
 @CompoundIndex(
         name = "client_category_idx",
-        def = "{'clientId': 1, 'answeredStatementList.statementCategory': 1}"
+        def = "{'clientId': 1, 'statementDocuments.statementCategory': 1}"
 )
 public class ClientAnswerDocument {
     @Id
     private String id;
+    @Indexed(name = "public_id_idx")
+    private String publicId = UUID.randomUUID().toString();
     @Indexed(name = "client_id_idx")
     private String clientId;
     private String submissionId;
-    private String name;
+    private Instant submissionDate;
+    private String clientName;
     private String testName;
     private List<ClientStatementDocument> statementDocuments;
     @CreatedDate
@@ -36,11 +40,16 @@ public class ClientAnswerDocument {
     @Version
     private Long version;
 
-
-    public ClientAnswerDocument(String clientId, String submissionId, String name, String testName, List<ClientStatementDocument> clientAnswerDocuments) {
+    public ClientAnswerDocument(String clientId,
+                                String submissionId,
+                                Instant submissionDate,
+                                String clientName,
+                                String testName,
+                                List<ClientStatementDocument> clientAnswerDocuments) {
         this.clientId = clientId;
         this.submissionId = submissionId;
-        this.name = name;
+        this.submissionDate  = submissionDate;
+        this.clientName = clientName;
         this.testName = testName;
         this.statementDocuments = clientAnswerDocuments;
     }
@@ -49,6 +58,7 @@ public class ClientAnswerDocument {
         return new ClientAnswerDocument(
                 domain.getClientId(),
                 domain.getSubmissionId(),
+                domain.getSubmissionDate(),
                 domain.getName(),
                 domain.getTestName(),
                 ClientStatementDocument.toDocumentList(domain.getClientStatementList()));
@@ -57,9 +67,12 @@ public class ClientAnswerDocument {
     public ClientAnswer toDomain() {
         return new ClientAnswer(
                 clientId,
+                publicId,
                 submissionId,
-                name,
+                submissionDate,
+                clientName,
                 testName,
+                createdAt,
                 statementDocuments.stream()
                         .map(ClientStatementDocument::toDomain)
                         .toList());

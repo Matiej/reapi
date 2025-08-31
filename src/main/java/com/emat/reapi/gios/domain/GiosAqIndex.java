@@ -1,6 +1,6 @@
 package com.emat.reapi.gios.domain;
 
-import com.emat.reapi.api.dto.GiosAqIndexDto;
+import com.emat.reapi.api.gios.GiosAqIndexDto;
 import com.emat.reapi.gios.infra.AqIndexDocument;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -7,12 +7,15 @@ import com.emat.reapi.profiler.infra.ClientAnswerRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ProfilerServiceImpl implements ProfilerService {
+class ProfilerServiceImpl implements ProfilerService {
     private final ClientAnswerRepository clientAnswerRepository;
 
     @Override
@@ -24,5 +27,16 @@ public class ProfilerServiceImpl implements ProfilerService {
                 .doOnSuccess(saved -> log.debug("Saved clients answers: {}", clientAnswer))
                 .doOnError(error -> log.error("Error saving client answers for clientId: {}", clientAnswer.clientId(), error))
                 .then();
+    }
+
+    @Override
+    public Mono<List<ClientAnswer>> getAllAnsweredStatements() {
+        log.info("Trying to retrieve all clients tests");
+        return clientAnswerRepository.findAll()
+                .map(ClientAnswerDocument::toDomain)
+                .collectList()
+                .doOnError(error -> log.error("Error retrieving client test answers"))
+                .doOnSuccess(it -> log.info("Retrieved {} client tests", it.size())
+                );
     }
 }

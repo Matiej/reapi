@@ -1,4 +1,4 @@
-package com.emat.reapi.profiler.domain;
+package com.emat.reapi.statement.domain;
 
 import lombok.Getter;
 
@@ -11,5 +11,4 @@ public enum StatementType {
     StatementType(String plDescription) {
         this.plDescription = plDescription;
     }
-
 }

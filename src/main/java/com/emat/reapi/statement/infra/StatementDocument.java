@@ -1,7 +1,7 @@
-package com.emat.reapi.profiler.infra;
+package com.emat.reapi.statement.infra;
 
-import com.emat.reapi.profiler.domain.Statement;
-import com.emat.reapi.profiler.domain.StatementType;
+import com.emat.reapi.statement.domain.Statement;
+import com.emat.reapi.statement.domain.StatementType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

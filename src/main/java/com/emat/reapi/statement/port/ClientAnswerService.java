@@ -1,12 +1,12 @@
-package com.emat.reapi.profiler.port;
+package com.emat.reapi.statement.port;
 
 import com.emat.reapi.api.dto.ClientAnswerDto;
-import com.emat.reapi.profiler.domain.ClientAnswer;
+import com.emat.reapi.statement.domain.ClientAnswer;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-public interface ProfilerService {
+public interface ClientAnswerService {
     Mono<Void> saveClientAnswers(ClientAnswerDto clientAnswer);
     Mono<List<ClientAnswer>> getAllAnsweredStatements();
 }

@@ -4,9 +4,9 @@ import com.emat.reapi.api.dto.AnsweredStatementDto;
 import com.emat.reapi.api.dto.ClientAnswerDto;
 import com.emat.reapi.api.dto.StatementDto;
 import com.emat.reapi.api.tally.TallyWebhookEvent;
-import com.emat.reapi.profiler.domain.StatementDefinition;
-import com.emat.reapi.profiler.domain.StatementTypeDefinition;
-import com.emat.reapi.profiler.infra.StatementDefinitionsDictionary;
+import com.emat.reapi.statement.domain.StatementDefinition;
+import com.emat.reapi.statement.domain.StatementTypeDefinition;
+import com.emat.reapi.statement.infra.StatementDefinitionsDictionary;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;

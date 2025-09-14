@@ -1,9 +1,9 @@
-package com.emat.reapi.profiler.port;
+package com.emat.reapi.statement.port;
 
-import com.emat.reapi.profiler.domain.StatementDefinition;
-import com.emat.reapi.profiler.infra.ClientAnswerRepository;
-import com.emat.reapi.profiler.infra.StatementDefinitionDocument;
-import com.emat.reapi.profiler.infra.StatementDefinitionRepository;
+import com.emat.reapi.statement.domain.StatementDefinition;
+import com.emat.reapi.statement.infra.ClientAnswerRepository;
+import com.emat.reapi.statement.infra.StatementDefinitionDocument;
+import com.emat.reapi.statement.infra.StatementDefinitionRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 @Service
 @Slf4j
 @AllArgsConstructor
-public class StatementServiceImpl implements StatementService {
+public class StatementDefinitionServiceImpl implements StatementDefinitionService {
     private final StatementDefinitionRepository statementDefinitionRepository;
     private final ClientAnswerRepository clientAnswerRepository;
 

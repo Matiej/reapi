@@ -1,4 +1,4 @@
-package com.emat.reapi.profiler.domain;
+package com.emat.reapi.statement.domain;
 
 import java.util.Arrays;
 

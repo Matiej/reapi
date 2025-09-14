@@ -1,7 +1,7 @@
-package com.emat.reapi.profiler.infra;
+package com.emat.reapi.statement.infra;
 
-import com.emat.reapi.profiler.domain.StatementCategory;
-import com.emat.reapi.profiler.domain.StatementCategoryDefinition;
+import com.emat.reapi.statement.domain.StatementCategory;
+import com.emat.reapi.statement.domain.StatementCategoryDefinition;
 
 import java.util.Map;
 

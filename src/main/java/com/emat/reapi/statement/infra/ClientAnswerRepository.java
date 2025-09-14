@@ -1,4 +1,4 @@
-package com.emat.reapi.profiler.infra;
+package com.emat.reapi.statement.infra;
 
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;

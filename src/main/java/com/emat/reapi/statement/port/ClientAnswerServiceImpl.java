@@ -1,9 +1,9 @@
-package com.emat.reapi.profiler.port;
+package com.emat.reapi.statement.port;
 
 import com.emat.reapi.api.dto.ClientAnswerDto;
-import com.emat.reapi.profiler.domain.ClientAnswer;
-import com.emat.reapi.profiler.infra.ClientAnswerDocument;
-import com.emat.reapi.profiler.infra.ClientAnswerRepository;
+import com.emat.reapi.statement.domain.ClientAnswer;
+import com.emat.reapi.statement.infra.ClientAnswerDocument;
+import com.emat.reapi.statement.infra.ClientAnswerRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import java.util.List;
 @Slf4j
 @Service
 @AllArgsConstructor
-class ProfilerServiceImpl implements ProfilerService {
+class ClientAnswerServiceImpl implements ClientAnswerService {
     private final ClientAnswerRepository clientAnswerRepository;
 
     @Override

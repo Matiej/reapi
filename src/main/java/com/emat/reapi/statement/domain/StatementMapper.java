@@ -1,10 +1,10 @@
-package com.emat.reapi.profiler.domain;
+package com.emat.reapi.statement.domain;
 
 import com.emat.reapi.api.dto.AnsweredStatementDto;
 import com.emat.reapi.api.dto.AnsweredStatementResponse;
 import com.emat.reapi.api.dto.StatementDto;
 import com.emat.reapi.api.dto.StatementResponse;
-import com.emat.reapi.profiler.infra.StatementDefinitionsDictionary;
+import com.emat.reapi.statement.infra.StatementDefinitionsDictionary;
 
 import java.util.List;
 

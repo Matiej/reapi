@@ -9,4 +9,6 @@ import java.util.List;
 public interface ClientAnswerService {
     Mono<Void> saveClientAnswers(ClientAnswerDto clientAnswer);
     Mono<List<ClientAnswer>> getAllAnsweredStatements();
+    Mono<ClientAnswer> getAnsweredStatementBySubmissionId(String submissionId);
+    Mono<ClientAnswer> getAnsweredStatementByClientId(String clientId);
 }

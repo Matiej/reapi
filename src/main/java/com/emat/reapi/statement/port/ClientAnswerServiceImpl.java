@@ -38,4 +38,24 @@ class ClientAnswerServiceImpl implements ClientAnswerService {
                 .doOnSuccess(it -> log.info("Retrieved {} client tests", it.size())
                 );
     }
+
+    @Override
+    public Mono<ClientAnswer> getAnsweredStatementBySubmissionId(String submissionId) {
+        log.info("Trying to retrieve client test by submission Id: {}", submissionId);
+        return clientAnswerRepository.findClientAnswerDocumentBySubmissionId(submissionId)
+                .map(ClientAnswerDocument::toDomain)
+                .doOnError(error -> log.error("Error retrieving client test answers"))
+                .doOnSuccess(it -> log.info("Retrieved client test for submission Id: {}", it.getSubmissionId())
+                );
+    }
+
+    @Override
+    public Mono<ClientAnswer> getAnsweredStatementByClientId(String clientId) {
+        log.info("Trying to retrieve client test by client Id: {}", clientId);
+        return clientAnswerRepository.findClientAnswerDocumentByClientId(clientId)
+                .map(ClientAnswerDocument::toDomain)
+                .doOnError(error -> log.error("Error retrieving client test answers for client id: {}", clientId))
+                .doOnSuccess(it -> log.info("Retrieved client test for client Id: {}", it.getClientId())
+                );
+    }
 }

@@ -13,20 +13,20 @@ public enum StatementCategory {
     BLOCKED_IN_RECEIVING("Zatrzymana w Przyjmowaniu"),
     MODESTY_IDEALIST("Idealistka Skromności");
 
-    private final String plDescription;
+    private final String plName;
 
     StatementCategory(String plDescription) {
-        this.plDescription = plDescription;
+        this.plName = plDescription;
     }
 
-    public String getPlDescription() {
-        return plDescription;
+    public String getPlName() {
+        return plName;
     }
 
     public static StatementCategory fromPlDescription(String value) {
         if (value == null) return null;
         return Arrays.stream(values())
-                .filter(v -> v.plDescription.trim().equalsIgnoreCase(value.trim()))
+                .filter(v -> v.plName.trim().equalsIgnoreCase(value.trim()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Unknown Polish description: " + value));

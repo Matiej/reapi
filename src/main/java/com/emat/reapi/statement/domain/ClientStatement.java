@@ -12,5 +12,4 @@ public class ClientStatement {
     private String key;
     private List<Statement> statementList;
     private StatementCategory statementCategory;
-
 }

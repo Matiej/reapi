@@ -21,7 +21,7 @@ public record ClientAnswerResponse(
                 answer.getClientId(),
                 answer.getSubmissionId(),
                 answer.getSubmissionDate().toString(),
-                answer.getName(),
+                answer.getClientName(),
                 answer.getTestName(),
                 answer.getDate().toString(),
                 answer.getClientStatementList().stream()

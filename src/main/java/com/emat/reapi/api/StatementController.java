@@ -8,9 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -32,7 +30,7 @@ public class StatementController {
     )
     @GetMapping()
     public Mono<List<ClientAnswerResponse>> answeredStatements() {
-        log.info("Received request: GET /api/profiler to retrieve all client answered statements");
+        log.info("Received request: GET /api/statement to retrieve all client answered statements");
         return clientAnswerService.getAllAnsweredStatements()
                 .map(d -> d.stream()
                         .map(ClientAnswerResponse::fromDomain)
@@ -40,5 +38,10 @@ public class StatementController {
                 );
     }
 
-
+    @GetMapping("/submission/{submissionId}")
+    public Mono<ClientAnswerResponse> answeredStatement(@PathVariable String submissionId) {
+        log.info("Received request: GET /api/statement/submission/{submissionId} answered statements fo submission: {}", submissionId);
+        return clientAnswerService.getAnsweredStatementBySubmissionId(submissionId)
+                .map(ClientAnswerResponse::fromDomain);
+    }
 }

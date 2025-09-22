@@ -59,7 +59,7 @@ public class ClientAnswerDocument {
                 domain.getClientId(),
                 domain.getSubmissionId(),
                 domain.getSubmissionDate(),
-                domain.getName(),
+                domain.getClientName(),
                 domain.getTestName(),
                 ClientStatementDocument.toDocumentList(domain.getClientStatementList()));
     }

@@ -27,7 +27,7 @@ public final class StatementMapper {
         return new AnsweredStatementResponse(
                 clientStatement.getStatementId(),
                 clientStatement.getKey(),
-                clientStatement.getStatementCategory().getPlDescription(),
+                clientStatement.getStatementCategory().getPlName(),
                 clientStatement.getStatementList().stream().map(StatementMapper::toStatementResponseDto).toList()
         );
     }

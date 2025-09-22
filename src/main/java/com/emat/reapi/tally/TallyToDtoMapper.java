@@ -4,11 +4,12 @@ import com.emat.reapi.api.dto.AnsweredStatementDto;
 import com.emat.reapi.api.dto.ClientAnswerDto;
 import com.emat.reapi.api.dto.StatementDto;
 import com.emat.reapi.api.tally.TallyWebhookEvent;
-import com.emat.reapi.profiler.domain.StatementDefinition;
-import com.emat.reapi.profiler.infra.StatementDefinitionsDictionary;
-import com.emat.reapi.profiler.domain.StatementTypeDefinition;
+import com.emat.reapi.statement.domain.StatementDefinition;
+import com.emat.reapi.statement.domain.StatementTypeDefinition;
+import com.emat.reapi.statement.infra.StatementDefinitionsDictionary;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,6 +27,7 @@ public final class TallyToDtoMapper {
         var data = event.getData();
         String clientId = data.getRespondentId();
         String submissionId = data.getSubmissionId();
+        Instant submissionDate = Instant.parse(data.getCreatedAt());
         String name = findValueByLabel(data.getFields(), "Imię");
 
         Map<String, AnsweredStatementDto> resultMap = new LinkedHashMap<>();
@@ -84,7 +86,7 @@ public final class TallyToDtoMapper {
         List<AnsweredStatementDto> answeredStatements = new ArrayList<>(resultMap.values());
         answeredStatements.sort(Comparator.comparingInt(dto -> Integer.parseInt(dto.getStatementId())));
 
-        return new ClientAnswerDto(clientId, submissionId, name, data.getFormName(), answeredStatements);
+        return new ClientAnswerDto(clientId, submissionId, submissionDate, name, data.getFormName(), answeredStatements);
     }
 
     private static String findValueByLabel(List<TallyWebhookEvent.Field> fields, String label) {

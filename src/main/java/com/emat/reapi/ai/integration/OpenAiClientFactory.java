@@ -7,6 +7,7 @@ import org.springframework.ai.openai.*;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.ai.openai.api.OpenAiImageApi;
+import org.springframework.ai.openai.api.ResponseFormat;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.retry.support.RetryTemplate;
@@ -23,10 +24,24 @@ import java.util.Map;
 public class OpenAiClientFactory {
     private static final int MAX_TOKENS = 240;
     private static final double TEMPERATURE = 0.7;
-    private static final Map<OpenAiApi.ChatModel, OpenAiChatModel> openAiChatModelMap = new EnumMap<>(OpenAiApi.ChatModel.class);
+    private static final int SO_MAX_TOKENS = 1500;   // raporty bywają dłuższe
+    private static final double SO_TEMPERATURE = 0.2; // stabilniejsze JSON-y
+    private static final Map<OpenAiApi.ChatModel, OpenAiChatModel> openAiChatModelMap =
+            new EnumMap<>(OpenAiApi.ChatModel.class);
+    private static final Map<OpenAiApi.ChatModel, OpenAiChatModel> structuredOutputModelMap =
+            new EnumMap<>(OpenAiApi.ChatModel.class);
     private final OpenAiParams opeApiParams;
     private final WebClient.Builder openAiWebClinetBuilder;
     private final RestClient.Builder restClientBuilder;
+
+    // Modele, które sensownie wspierają JSON_SCHEMA/JSON mode
+    private static final List<OpenAiApi.ChatModel> STRUCTURED_SUPPORTED = List.of(
+            OpenAiApi.ChatModel.GPT_4_O,
+            OpenAiApi.ChatModel.GPT_4_O_MINI,
+            OpenAiApi.ChatModel.GPT_4_TURBO,
+            OpenAiApi.ChatModel.GPT_4_1,
+            OpenAiApi.ChatModel.GPT_4_1_MINI
+    );
 
     public OpenAiClientFactory(
             OpenAiParams opeApiParams,
@@ -36,6 +51,7 @@ public class OpenAiClientFactory {
         this.openAiWebClinetBuilder = openAiWebClinetBuilder;
         this.restClientBuilder = restClientBuilder;
         initializeOpenAiChatModels();
+        initializeStructuredOutputModels()
     }
 
     private void initializeOpenAiChatModels() {
@@ -55,8 +71,50 @@ public class OpenAiClientFactory {
         }
     }
 
+    private void initializeStructuredOutputModels() {
+        for (OpenAiApi.ChatModel chatModelEnum : STRUCTURED_SUPPORTED) {
+            var options = OpenAiChatOptions.builder()
+                    .model(chatModelEnum)
+                    .maxTokens(SO_MAX_TOKENS)     // ważne dla modeli „nie-reasoning”
+                    .temperature(SO_TEMPERATURE)  // niższa temp. = stabilniejsze JSON-y
+                    .build();
+
+            var soModel = OpenAiChatModel.builder()
+                    .openAiApi(buildOpenAiApi())
+                    .defaultOptions(options)
+                    .build();
+
+            structuredOutputModelMap.put(chatModelEnum, soModel);
+        }
+    }
+
+    public OpenAiChatModel createStructuredOutputChatModel(OpenAiApi.ChatModel chatModel) {
+        return structuredOutputModelMap.get(chatModel);
+    }
+
     public OpenAiChatModel createChatModel(OpenAiApi.ChatModel chatModel) {
         return openAiChatModelMap.get(chatModel);
+    }
+
+    public OpenAiChatOptions structuredOutputOptions(OpenAiApi.ChatModel chatModel,
+                                                     String schemaName,
+                                                     String jsonSchema,
+                                                     boolean strict) {
+        var rf = ResponseFormat.builder()
+                .type(ResponseFormat.Type.JSON_SCHEMA)
+                .jsonSchema(ResponseFormat.JsonSchema.builder()
+                        .name(schemaName)
+                        .schema(jsonSchema)
+                        .strict(strict)
+                        .build())
+                .build();
+
+        return OpenAiChatOptions.builder()
+                .model(chatModel)
+                .maxTokens(SO_MAX_TOKENS)
+                .temperature(SO_TEMPERATURE)
+                .responseFormat(rf)
+                .build();
     }
 
     public OpenAiAudioSpeechModel createAudioSpeechModel(
@@ -124,6 +182,7 @@ public class OpenAiClientFactory {
                 .defaultOptions(options)
                 .build();
     }
+
 
     private OpenAiApi buildOpenAiApi() {
         return OpenAiApi.builder()

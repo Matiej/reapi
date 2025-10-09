@@ -91,13 +91,15 @@
             <artifactId>spring-ai-vector-store</artifactId>
             <version>1.0.0</version>
         </dependency>
-
-
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>1.5.9</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Kompilacja Javy -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

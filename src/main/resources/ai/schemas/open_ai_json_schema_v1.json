@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:com.emat.ai:InsightReport:v1",
+  "title": "InsightReport",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "clientSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "keyThemes": { "type": "array", "items": { "type": "string" }, "default": [] },
+        "dominantCategories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "categoryId": { "type": "string" },
+              "balanceIndex": { "type": "number" },
+              "why": { "type": "string" }
+            },
+            "required": ["categoryId", "balanceIndex", "why"]
+          },
+          "default": []
+        },
+        "overallNarrativePl": { "type": "string" }
+      },
+      "required": ["keyThemes", "dominantCategories", "overallNarrativePl"]
+    },
+    "categoryInsights": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "categoryId": { "type": "string" },
+          "categoryLabelPl": { "type": "string" },
+          "strengthsPl": { "type": "array", "items": { "type": "string" }, "default": [] },
+          "risksPl": { "type": "array", "items": { "type": "string" }, "default": [] },
+          "contradictionsPl": { "type": "array", "items": { "type": "string" }, "default": [] },
+          "recommendedInterventions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["rytuał", "ćwiczenie", "nawyk", "zadanie liczbowe", "praca z przekonaniem"]
+                },
+                "titlePl": { "type": "string" },
+                "whyPl": { "type": "string" },
+                "howPl": { "type": "string" }
+              },
+              "required": ["type", "titlePl", "whyPl", "howPl"]
+            },
+            "default": []
+          }
+        },
+        "required": [
+          "categoryId",
+          "categoryLabelPl",
+          "strengthsPl",
+          "risksPl",
+          "contradictionsPl",
+          "recommendedInterventions"
+        ]
+      },
+      "default": []
+    },
+    "nextSteps": { "type": "array", "items": { "type": "string" }, "default": [] }
+  },
+  "required": ["clientSummary", "categoryInsights", "nextSteps"]
+}

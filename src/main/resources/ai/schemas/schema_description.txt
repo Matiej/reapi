@@ -1,0 +1,73 @@
+O czym jest ten schema?
+
+To kontrakt na ustrukturyzowany raport z analizy testu. Model ma zwrócić wyłącznie JSON zgodny ze schematem, dzięki czemu:
+
+masz przewidywalne pola do wyświetlenia w UI / PDF,
+
+łatwo walidujesz wynik,
+
+możesz porównywać raporty między klientkami.
+-----------------------------
+Struktura top-level
+
+clientSummary – skrót całości w 3 częściach (tematy, dominujące kategorie, narracja ogólna).
+
+categoryInsights – wnioski per kategoria: mocne strony, ryzyka, sprzeczności, rekomendacje.
+
+nextSteps – lista prostych kroków do wdrożenia od razu.
+
+Te trzy pola są wymagane (required na dole schema).
+
+-------------------------------
+1) clientSummary (wymagane)
+
+keyThemes (array<string>)
+3–7 haseł typu: „prokrastynacja przy decyzjach finansowych”, „trudność z przyjmowaniem”, „rosnąca gotowość do lekkości”.
+
+dominantCategories (array<object>)
+Lista 2–4 kategorii, które najmocniej wybrzmiały. Każdy obiekt ma:
+
+categoryId (string) – np. SCARCITY_GUARDIAN, FROZEN_VISIONARY itd. (Twoje enumy).
+
+balanceIndex (number) – Twój wskaźnik równowagi dla tej kategorii (np. supportingTrue / (limitingTrue + supportingTrue); zakres 0–1: im bliżej 1, tym bardziej wspierająco).
+
+why (string) – 1–3 zdania dlaczego ta kategoria jest dominująca (odwołanie do wzorców z odpowiedzi).
+
+overallNarrativePl (string)
+3–6 zdań spójnej narracji: „Co tu się dzieje?”, „Jaki jest motyw przewodni?”, „Na czym oprzeć transformację?”
+------------------------------
+2) categoryInsights (wymagane)
+
+Tablica obiektów – jeden obiekt na kategorię, którą chcesz opisać (zwykle 3–8, zależnie od wyniku).
+
+Każdy obiekt:
+
+categoryId (string) – ID z Twojego enuma, np. WITHDRAWN_LEADER.
+
+categoryLabelPl (string) – polska etykieta, np. „Wycofana Liderka”.
+
+strengthsPl (array<string>) – zasoby tej kategorii wynikające z odpowiedzi (3–5 punktów).
+
+risksPl (array<string>) – ryzyka/blokady (3–5 punktów).
+
+contradictionsPl (array<string>) – sprzeczności typu „deklaruję lekkość, ale wybieram ciężar”; pole opcjonalne (nie ma go w required).
+
+recommendedInterventions (array<object>) – konkretne działania:
+
+type (enum) – jedno z: rytuał, ćwiczenie, nawyk, zadanie liczbowe, praca z przekonaniem.
+
+titlePl (string) – krótki tytuł (np. „Rytuał równowagi brania i dawania”).
+
+whyPl (string) – po co to w kontekście tej kategorii (1–2 zdania).
+
+howPl (string) – jak to zrobić, kroki w punktach lub krótkiej instrukcji.
+
+strengthsPl, risksPl, recommendedInterventions są wymagane; contradictionsPl — nie (możesz pominąć, gdy nic nie zgrzyta).
+-----------------------------------
+3) nextSteps (wymagane)
+
+Lista 3–7 prostych kroków, które klientka może wdrożyć „tu i teraz”, np.:
+
+„Zaplanuj 2 mikro-decyzje finansowe do końca tygodnia.”
+
+„Wprowadź 10-min rytuał zamknięcia dnia z podsumowaniem przychodów/wychodów.”

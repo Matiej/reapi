@@ -31,7 +31,7 @@ public class OpenAiClientFactory {
     private static final Map<OpenAiApi.ChatModel, OpenAiChatModel> structuredOutputModelMap =
             new EnumMap<>(OpenAiApi.ChatModel.class);
     private final OpenAiParams opeApiParams;
-    private final WebClient.Builder openAiWebClinetBuilder;
+    private final WebClient.Builder openAiWebClientBuilder;
     private final RestClient.Builder restClientBuilder;
 
     // Modele, które sensownie wspierają JSON_SCHEMA/JSON mode
@@ -45,13 +45,13 @@ public class OpenAiClientFactory {
 
     public OpenAiClientFactory(
             OpenAiParams opeApiParams,
-            @Qualifier("openAiWebClientBuilder") WebClient.Builder openAiWebClinetBuilder,
+            @Qualifier("openAiWebClientBuilder") WebClient.Builder openAiWebClientBuilder,
             @Qualifier("openAiRestClientBuilder") RestClient.Builder restClientBuilder) {
         this.opeApiParams = opeApiParams;
-        this.openAiWebClinetBuilder = openAiWebClinetBuilder;
+        this.openAiWebClientBuilder = openAiWebClientBuilder;
         this.restClientBuilder = restClientBuilder;
         initializeOpenAiChatModels();
-        initializeStructuredOutputModels()
+        initializeStructuredOutputModels();
     }
 
     private void initializeOpenAiChatModels() {
@@ -130,9 +130,9 @@ public class OpenAiClientFactory {
                 .build();
 
         var audioApi = OpenAiAudioApi.builder()
-                .baseUrl("https://api.openai.com/")
+                .baseUrl(opeApiParams.getBaseUrl())
                 .apiKey(opeApiParams.getOpenApiKey())
-                .webClientBuilder(openAiWebClinetBuilder)
+                .webClientBuilder(openAiWebClientBuilder)
                 .build();
 
         RetryTemplate retryTemplate = RetryTemplate.builder()
@@ -188,7 +188,7 @@ public class OpenAiClientFactory {
         return OpenAiApi.builder()
                 .baseUrl(opeApiParams.getBaseUrl())
                 .apiKey(opeApiParams.getOpenApiKey())
-                .webClientBuilder(openAiWebClinetBuilder)
+                .webClientBuilder(openAiWebClientBuilder)
                 .build();
     }
 }

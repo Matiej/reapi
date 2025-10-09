@@ -1,0 +1,57 @@
+package com.emat.reapi.profiler.infra;
+
+import com.emat.reapi.profiler.domain.report.InsightReport;
+import com.emat.reapi.profiler.domain.report.InsightReportAiResponse;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.Instant;
+
+@Document("profiler_insight_report")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class InsightReportDocument {
+    @Id
+    private String id;
+    @Indexed(unique = true)
+    private String submissionId;
+    private String clientId;
+    private String testName;
+    private String aiModel;
+    private String schemaName;
+    private String schemaVersion;
+    private String reportJson;
+    private Instant createdAt;
+
+    public static InsightReportDocument from(InsightReport report) {
+        var doc = new InsightReportDocument();
+        doc.setSubmissionId(report.getSubmissionId());
+        doc.setClientId(report.getClientId());
+        doc.setTestName(report.getTestName());
+        doc.setAiModel(report.getModel());
+        doc.setSchemaName(report.getSchemaName());
+        doc.setSchemaVersion(report.getSchemaVersion());
+        doc.setReportJson(report.getRawJson());
+        doc.setCreatedAt(report.getCreatedAt() != null ? report.getCreatedAt() : Instant.now());
+        return doc;
+    }
+
+    public InsightReport toDomain() {
+        return InsightReport.builder()
+                .submissionId(submissionId)
+                .clientId(clientId)
+                .testName(testName)
+                .model(aiModel)
+                .schemaName(schemaName)
+                .schemaVersion(schemaVersion)
+                .createdAt(createdAt)
+                .rawJson(reportJson)
+                .build();
+    }
+
+}

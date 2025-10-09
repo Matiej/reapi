@@ -1,0 +1,47 @@
+package com.emat.reapi.profiler.domain.report;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.Instant;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class InsightReport {
+    private String submissionId;
+    private String clientId;
+    private String testName;
+    private String model;
+    private String schemaName;
+    private String schemaVersion;
+    private Instant createdAt;
+    private String rawJson;
+    @Builder.Default
+    private transient InsightReportStructuredAiResponse payload = null;
+
+    public static InsightReport of(String submissionId,
+                                   String clientId,
+                                   String testName,
+                                   String model,
+                                   String schemaName,
+                                   String schemaVersion,
+                                   String rawJson,
+                                   Instant createdAt,
+                                   InsightReportStructuredAiResponse payload) {
+        return InsightReport.builder()
+                .submissionId(submissionId)
+                .clientId(clientId)
+                .testName(testName)
+                .model(model)
+                .schemaName(schemaName)
+                .schemaVersion(schemaVersion)
+                .createdAt(createdAt)
+                .rawJson(rawJson)
+                .payload(payload)
+                .build();
+    }
+}

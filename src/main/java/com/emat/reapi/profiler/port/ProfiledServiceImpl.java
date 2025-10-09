@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,9 +30,21 @@ class ProfiledServiceImpl implements ProfiledService {
     @Override
     public Mono<ProfiledClientAnswer> getClientProfiledStatement(String submissionId) {
         return clientAnswerService.getAnsweredStatementBySubmissionId(submissionId)
-                .map(this::mapToProfiledClientAnswer);
+                .map(this::mapToProfiledClientAnswer)
+                .map(this::sortByTotalLimiting);
     }
 
+    private ProfiledClientAnswer sortByTotalLimiting(ProfiledClientAnswer profiledClientAnswer) {
+        List<ProfiledCategoryClientStatements> list = profiledClientAnswer.getProfiledCategoryClientStatementsList()
+                .stream()
+                .sorted(Comparator.comparingInt(ProfiledCategoryClientStatements::getTotalLimiting))
+                .toList()
+                .reversed();
+        profiledClientAnswer.setProfiledCategoryClientStatementsList(list);
+        return profiledClientAnswer;
+    }
+
+    //TODO sorting by count
     private ProfiledClientAnswer mapToProfiledClientAnswer(ClientAnswer clientAnswer) {
         return new ProfiledClientAnswer(
                 clientAnswer.getClientName(),

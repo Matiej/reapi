@@ -14,6 +14,7 @@ import java.time.Instant;
 public class InsightReport {
     private String submissionId;
     private String clientId;
+    private String clientName;
     private String testName;
     private String model;
     private String schemaName;
@@ -25,6 +26,7 @@ public class InsightReport {
 
     public static InsightReport of(String submissionId,
                                    String clientId,
+                                   String clientName,
                                    String testName,
                                    String model,
                                    String schemaName,
@@ -35,6 +37,7 @@ public class InsightReport {
         return InsightReport.builder()
                 .submissionId(submissionId)
                 .clientId(clientId)
+                .clientName(clientName)
                 .testName(testName)
                 .model(model)
                 .schemaName(schemaName)

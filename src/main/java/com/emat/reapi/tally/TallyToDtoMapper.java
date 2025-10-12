@@ -20,73 +20,82 @@ public final class TallyToDtoMapper {
     private TallyToDtoMapper() {
     }
 
-    private static final Pattern QUESTION_NUMBER_PATTERN =
-            Pattern.compile("^(\\d{1,3})\\)");
-
     public static ClientAnswerDto map(TallyWebhookEvent event) {
         var data = event.getData();
         String clientId = data.getRespondentId();
         String submissionId = data.getSubmissionId();
         Instant submissionDate = Instant.parse(data.getCreatedAt());
+
         String name = findValueByLabel(data.getFields(), "Imię");
 
         Map<String, AnsweredStatementDto> resultMap = new LinkedHashMap<>();
 
         for (var field : data.getFields()) {
-            if (!"CHECKBOXES".equalsIgnoreCase(field.getType())) continue;
-            if (!(field.getValue() instanceof Boolean)) continue;
+            if (!"MULTIPLE_CHOICE".equalsIgnoreCase(field.getType())) continue;
 
-            String label = field.getLabel();
-            if (label == null) continue;
+            String key = field.getKey();
 
-            Matcher matcher = QUESTION_NUMBER_PATTERN.matcher(label);
-            if (!matcher.find()) continue;
-
-            String statementId = matcher.group(1);
-            StatementDefinition def;
+            final StatementDefinition def;
             try {
-                def = StatementDefinitionsDictionary.requireById(statementId);
+                def = StatementDefinitionsDictionary.requireByKey(key);
             } catch (Exception ex) {
-                log.warn("No definition for statementId={}", statementId);
+                log.warn("No definition for key={}", key);
                 continue;
             }
 
-            String fieldKey = field.getKey();
-            String[] parts = fieldKey.split("_");
-            String optionId = parts[parts.length - 1];
-            boolean status = Boolean.TRUE.equals(field.getValue());
-
-            StatementTypeDefinition matchedType = def.getStatementTypeDefinitions().stream()
-                    .filter(opt -> opt.getKey().equals(optionId))
-                    .findFirst()
-                    .orElse(null);
-
-            if (matchedType == null) {
-                log.warn("OptionId {} nie pasuje do definicji dla statementId {}", optionId, statementId);
-                continue;
+            List<String> selectedIds = Collections.emptyList();
+            Object valueObj = field.getValue();
+            if (valueObj instanceof List<?> list) {
+                selectedIds = list.stream().filter(Objects::nonNull).map(String::valueOf).toList();
+            } else if (valueObj instanceof String s) {
+                selectedIds = List.of(s);
+            } else if (valueObj != null) {
+                log.warn("Unexpected MULTIPLE_CHOICE value type for key {}: {}", key, valueObj.getClass());
             }
 
-            AnsweredStatementDto dto = resultMap.computeIfAbsent(statementId, sid -> {
-                List<StatementDto> initialList = def.getStatementTypeDefinitions().stream()
-                        .map(opt -> new StatementDto(opt.getKey(), opt.getStatementDescription(), null))
+            AnsweredStatementDto answered = resultMap.computeIfAbsent(key, k -> {
+                List<StatementDto> allOptions = def.getStatementTypeDefinitions().stream()
+                        .map(opt -> new StatementDto(
+                                opt.getKey(),
+                                opt.getStatementDescription(),
+                                null // status uzupełnimy poniżej
+                        ))
                         .collect(Collectors.toList());
-                return new AnsweredStatementDto(statementId, def.getStatementKey(),  initialList);
+                return new AnsweredStatementDto(def.getStatementId(), key, allOptions);
             });
 
-            dto.getStatementDtoList().stream()
-                    .filter(s -> s.statementKey().equals(matchedType.getKey()))
-                    .findFirst()
-                    .ifPresent(s -> {
-                        int idx = dto.getStatementDtoList().indexOf(s);
-                        dto.getStatementDtoList().set(idx,
-                                new StatementDto(s.statementKey(), s.statementDescription(), status));
-                    });
+            Set<String> selectedSet = new HashSet<>(selectedIds);
+            for (String sel : selectedSet) {
+                boolean known = def.getStatementTypeDefinitions().stream()
+                        .anyMatch(opt -> Objects.equals(opt.getKey(), sel));
+                if (!known) {
+                    log.warn("Selected optionId {} not present in definition for key {}", sel, key);
+                }
+            }
+
+            List<StatementDto> updated = answered.getStatementDtoList().stream()
+                    .map(s -> new StatementDto(
+                            s.statementKey(),
+                            s.statementDescription(),
+                            selectedSet.contains(s.statementKey())
+                    ))
+                    .toList();
+
+            answered.getStatementDtoList().clear();
+            answered.getStatementDtoList().addAll(updated);
         }
 
         List<AnsweredStatementDto> answeredStatements = new ArrayList<>(resultMap.values());
         answeredStatements.sort(Comparator.comparingInt(dto -> Integer.parseInt(dto.getStatementId())));
 
-        return new ClientAnswerDto(clientId, submissionId, submissionDate, name, data.getFormName(), answeredStatements);
+        return new ClientAnswerDto(
+                clientId,
+                submissionId,
+                submissionDate,
+                name,
+                data.getFormName(),
+                answeredStatements
+        );
     }
 
     private static String findValueByLabel(List<TallyWebhookEvent.Field> fields, String label) {

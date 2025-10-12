@@ -18,6 +18,7 @@ import java.time.Instant;
 public class InsightReportDocument {
     @Id
     private String id;
+    private String clientName;
     @Indexed(unique = true)
     private String submissionId;
     private String clientId;
@@ -27,9 +28,11 @@ public class InsightReportDocument {
     private String schemaVersion;
     private String reportJson;
     private Instant createdAt;
+    private InsightReportStructuredAiDocument insightReportStructuredAiDocument;
 
     public static InsightReportDocument from(InsightReport report) {
         var doc = new InsightReportDocument();
+        doc.setClientName(report.getClientName());
         doc.setSubmissionId(report.getSubmissionId());
         doc.setClientId(report.getClientId());
         doc.setTestName(report.getTestName());
@@ -37,6 +40,7 @@ public class InsightReportDocument {
         doc.setSchemaName(report.getSchemaName());
         doc.setSchemaVersion(report.getSchemaVersion());
         doc.setReportJson(report.getRawJson());
+        doc.setInsightReportStructuredAiDocument(InsightReportStructuredAiDocument.from(report.getPayload()));
         doc.setCreatedAt(report.getCreatedAt() != null ? report.getCreatedAt() : Instant.now());
         return doc;
     }
@@ -45,6 +49,7 @@ public class InsightReportDocument {
         return InsightReport.builder()
                 .submissionId(submissionId)
                 .clientId(clientId)
+                .clientName(clientName)
                 .testName(testName)
                 .model(aiModel)
                 .schemaName(schemaName)

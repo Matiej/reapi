@@ -1,5 +1,6 @@
 package com.emat.reapi.statement.port;
 
+import com.emat.reapi.statement.domain.StatementCategory;
 import com.emat.reapi.statement.domain.StatementDefinition;
 import com.emat.reapi.statement.infra.ClientAnswerRepository;
 import com.emat.reapi.statement.infra.StatementDefinitionDocument;
@@ -9,6 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.emat.reapi.statement.infra.StatementDefinitionsDictionary.ALL;
 
 @Service
 @Slf4j
@@ -33,9 +39,12 @@ public class StatementDefinitionServiceImpl implements StatementDefinitionServic
     }
 
     @Override
-    public Flux<StatementDefinition> getStatementDefinitionsByCategory(String category) {
+    public Mono<List<StatementDefinition>> getStatementDefinitionsByCategory(StatementCategory category) {
         log.info("Retrieving all fistStatement definitions for category: {}", category);
-        return statementDefinitionRepository.findAllByCategory(category)
-                .map(StatementDefinitionDocument::toDomain);
+
+        return Mono.just(ALL.stream().filter(p-> p.getCategory().equals(category)).toList());
+
+//        return statementDefinitionRepository.findAllByCategory(category.name())
+//                .map(StatementDefinitionDocument::toDomain);
     }
 }

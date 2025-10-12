@@ -7,7 +7,7 @@ public final class ProfiledMapper {
 
     }
 
-    public static ProfiledClientAnswer toProfiledClientAnswer(ClientAnswerDocument clientAnswerDocument) {
+    public static ProfiledClientAnswerDetails toProfiledClientAnswer(ClientAnswerDocument clientAnswerDocument) {
         //TODO implement me
         return null;
     }

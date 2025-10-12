@@ -1,6 +1,5 @@
 package com.emat.reapi.profiler.infra;
 
-import com.emat.reapi.profiler.domain.report.InsightReport;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;

@@ -1,15 +1,16 @@
 package com.emat.reapi.profiler.port;
 
-import com.emat.reapi.profiler.domain.ProfiledClientAnswer;
-import org.springframework.stereotype.Service;
+import com.emat.reapi.profiler.domain.ProfiledClientAnswerDetails;
+import com.emat.reapi.profiler.domain.ProfiledClientAnswerShort;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 public interface ProfiledService {
 
-    Mono<ProfiledClientAnswer> getClientProfiledStatements(String clientId);
+    Mono<ProfiledClientAnswerDetails> getClientProfiledStatements(String clientId);
 
-    Mono<ProfiledClientAnswer> getClientProfiledStatement(String submissionId);
+    Mono<ProfiledClientAnswerDetails> getClientProfiledStatement(String submissionId);
+    Mono<List<ProfiledClientAnswerShort>> getProfiledStatements();
 
 }

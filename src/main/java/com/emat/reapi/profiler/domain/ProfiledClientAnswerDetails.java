@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class ProfiledClientAnswer {
+public class ProfiledClientAnswerDetails {
     private String clientName;
     private String clientId;
     private String submissionId;

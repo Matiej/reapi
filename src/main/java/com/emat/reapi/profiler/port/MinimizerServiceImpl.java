@@ -19,39 +19,39 @@ public class MinimizerServiceImpl implements MinimizerService {
     private static final int ENRICHED_TOP_K = 2; //ile kategorii wzbogacić
 
     @Override
-    public Mono<MinimizedPayload> minimize(ProfiledClientAnswer profiledClientAnswer, PayloadMode mode) {
+    public Mono<MinimizedPayload> minimize(ProfiledClientAnswerDetails profiledClientAnswerDetails, PayloadMode mode) {
 //        Objects.requireNonNull(pca, "ProfiledClientAnswer cannot be null");
-        if (profiledClientAnswer.getProfiledCategoryClientStatementsList() == null) {
-            return Mono.just(emptyFor(profiledClientAnswer));
+        if (profiledClientAnswerDetails.getProfiledCategoryClientStatementsList() == null) {
+            return Mono.just(emptyFor(profiledClientAnswerDetails));
         }
 
         // wybór kategorii do wzbogacenia w ENRICHED (najniższy balanceIndex, potem najwięcej aktywnych punktów)
         final Set<String> enrichedCategories = (mode == PayloadMode.ENRICHED)
-                ? pickWorstCategoriesByBalance(profiledClientAnswer, ENRICHED_TOP_K)
+                ? pickWorstCategoriesByBalance(profiledClientAnswerDetails, ENRICHED_TOP_K)
                 : Collections.emptySet();
 
-        List<ClientCategoryPayload> categories = profiledClientAnswer.getProfiledCategoryClientStatementsList().stream()
+        List<ClientCategoryPayload> categories = profiledClientAnswerDetails.getProfiledCategoryClientStatementsList().stream()
                 .map(cat -> toCategory(cat, mode, enrichedCategories))
                 .toList();
 
         MinimizedPayload payload = MinimizedPayload.builder()
-                .clientName(profiledClientAnswer.getClientName())
-                .clientId(profiledClientAnswer.getClientId())
-                .submissionId(profiledClientAnswer.getSubmissionId())
-                .testName(profiledClientAnswer.getTestName())
+                .clientName(profiledClientAnswerDetails.getClientName())
+                .clientId(profiledClientAnswerDetails.getClientId())
+                .submissionId(profiledClientAnswerDetails.getSubmissionId())
+                .testName(profiledClientAnswerDetails.getTestName())
                 .categories(categories)
-                .submissionDate(profiledClientAnswer.getSubmissionDate())
+                .submissionDate(profiledClientAnswerDetails.getSubmissionDate())
                 .build();
 
         return Mono.just(payload);
     }
 
-    private MinimizedPayload emptyFor(ProfiledClientAnswer profiledClientAnswer) {
+    private MinimizedPayload emptyFor(ProfiledClientAnswerDetails profiledClientAnswerDetails) {
         return MinimizedPayload.builder()
-                .clientName(profiledClientAnswer.getClientName())
-                .clientId(profiledClientAnswer.getClientId())
-                .submissionId(profiledClientAnswer.getSubmissionId())
-                .testName(profiledClientAnswer.getTestName())
+                .clientName(profiledClientAnswerDetails.getClientName())
+                .clientId(profiledClientAnswerDetails.getClientId())
+                .submissionId(profiledClientAnswerDetails.getSubmissionId())
+                .testName(profiledClientAnswerDetails.getTestName())
                 .categories(List.of())
                 .build();
     }
@@ -126,7 +126,7 @@ public class MinimizerServiceImpl implements MinimizerService {
         T get() throws Exception;
     }
 
-    private Set<String> pickWorstCategoriesByBalance(ProfiledClientAnswer pca, int k) {
+    private Set<String> pickWorstCategoriesByBalance(ProfiledClientAnswerDetails pca, int k) {
         return pca.getProfiledCategoryClientStatementsList().stream()
                 .sorted(Comparator
                         // 1) po rosnącym balanceIndex (im mniejszy, tym "gorzej")

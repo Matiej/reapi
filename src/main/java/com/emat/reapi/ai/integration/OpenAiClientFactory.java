@@ -24,7 +24,7 @@ import java.util.Map;
 public class OpenAiClientFactory {
     private static final int MAX_TOKENS = 240;
     private static final double TEMPERATURE = 0.7;
-    private static final int SO_MAX_TOKENS = 1500;   // raporty bywają dłuższe
+    private static final int SO_MAX_TOKENS = 4111;   // raporty bywają dłuższe
     private static final double SO_TEMPERATURE = 0.2; // stabilniejsze JSON-y
     private static final Map<OpenAiApi.ChatModel, OpenAiChatModel> openAiChatModelMap =
             new EnumMap<>(OpenAiApi.ChatModel.class);
@@ -33,6 +33,7 @@ public class OpenAiClientFactory {
     private final OpenAiParams opeApiParams;
     private final WebClient.Builder openAiWebClientBuilder;
     private final RestClient.Builder restClientBuilder;
+    private final RetryTemplate openAiChatRetryTemplate;
 
     // Modele, które sensownie wspierają JSON_SCHEMA/JSON mode
     private static final List<OpenAiApi.ChatModel> STRUCTURED_SUPPORTED = List.of(
@@ -46,10 +47,12 @@ public class OpenAiClientFactory {
     public OpenAiClientFactory(
             OpenAiParams opeApiParams,
             @Qualifier("openAiWebClientBuilder") WebClient.Builder openAiWebClientBuilder,
-            @Qualifier("openAiRestClientBuilder") RestClient.Builder restClientBuilder) {
+            @Qualifier("openAiRestClientBuilder") RestClient.Builder restClientBuilder,
+            RetryTemplate openAiChatRetryTemplate) {
         this.opeApiParams = opeApiParams;
         this.openAiWebClientBuilder = openAiWebClientBuilder;
         this.restClientBuilder = restClientBuilder;
+        this.openAiChatRetryTemplate = openAiChatRetryTemplate;
         initializeOpenAiChatModels();
         initializeStructuredOutputModels();
     }
@@ -66,6 +69,7 @@ public class OpenAiClientFactory {
             var openAiChatModel = OpenAiChatModel.builder()
                     .openAiApi(buildOpenAiApi())
                     .defaultOptions(options)
+                    .retryTemplate(openAiChatRetryTemplate)
                     .build();
             openAiChatModelMap.put(chatModelEnum, openAiChatModel);
         }
@@ -82,6 +86,7 @@ public class OpenAiClientFactory {
             var soModel = OpenAiChatModel.builder()
                     .openAiApi(buildOpenAiApi())
                     .defaultOptions(options)
+                    .retryTemplate(openAiChatRetryTemplate)
                     .build();
 
             structuredOutputModelMap.put(chatModelEnum, soModel);
@@ -180,15 +185,15 @@ public class OpenAiClientFactory {
         return OpenAiChatModel.builder()
                 .openAiApi(buildOpenAiApi())
                 .defaultOptions(options)
+                .retryTemplate(openAiChatRetryTemplate)
                 .build();
     }
-
 
     private OpenAiApi buildOpenAiApi() {
         return OpenAiApi.builder()
                 .baseUrl(opeApiParams.getBaseUrl())
                 .apiKey(opeApiParams.getOpenApiKey())
-                .webClientBuilder(openAiWebClientBuilder)
+                .restClientBuilder(restClientBuilder)
                 .build();
     }
 }

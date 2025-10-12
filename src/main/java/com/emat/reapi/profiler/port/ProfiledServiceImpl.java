@@ -1,9 +1,6 @@
 package com.emat.reapi.profiler.port;
 
-import com.emat.reapi.profiler.domain.ProfileCategory;
-import com.emat.reapi.profiler.domain.ProfiledCategoryClientStatements;
-import com.emat.reapi.profiler.domain.ProfiledClientAnswer;
-import com.emat.reapi.profiler.domain.ProfiledStatement;
+import com.emat.reapi.profiler.domain.*;
 import com.emat.reapi.statement.domain.*;
 import com.emat.reapi.statement.port.ClientAnswerService;
 import lombok.AllArgsConstructor;
@@ -22,37 +19,56 @@ class ProfiledServiceImpl implements ProfiledService {
     private final ClientAnswerService clientAnswerService;
 
     @Override
-    public Mono<ProfiledClientAnswer> getClientProfiledStatements(String clientId) {
+    public Mono<ProfiledClientAnswerDetails> getClientProfiledStatements(String clientId) {
         return clientAnswerService.getAnsweredStatementByClientId(clientId)
                 .map(this::mapToProfiledClientAnswer);
     }
 
     @Override
-    public Mono<ProfiledClientAnswer> getClientProfiledStatement(String submissionId) {
+    public Mono<ProfiledClientAnswerDetails> getClientProfiledStatement(String submissionId) {
         return clientAnswerService.getAnsweredStatementBySubmissionId(submissionId)
                 .map(this::mapToProfiledClientAnswer)
                 .map(this::sortByTotalLimiting);
     }
 
-    private ProfiledClientAnswer sortByTotalLimiting(ProfiledClientAnswer profiledClientAnswer) {
-        List<ProfiledCategoryClientStatements> list = profiledClientAnswer.getProfiledCategoryClientStatementsList()
+    @Override
+    public Mono<List<ProfiledClientAnswerShort>> getProfiledStatements() {
+        return clientAnswerService.getAllAnsweredStatements()
+                .map(clientAnswers -> clientAnswers
+                        .stream()
+                        .map(this::mapToProfiledClientAnswerShort)
+                        .toList());
+    }
+
+    private ProfiledClientAnswerDetails sortByTotalLimiting(ProfiledClientAnswerDetails profiledClientAnswerDetails) {
+        List<ProfiledCategoryClientStatements> list = profiledClientAnswerDetails.getProfiledCategoryClientStatementsList()
                 .stream()
                 .sorted(Comparator.comparingInt(ProfiledCategoryClientStatements::getTotalLimiting))
                 .toList()
                 .reversed();
-        profiledClientAnswer.setProfiledCategoryClientStatementsList(list);
-        return profiledClientAnswer;
+        profiledClientAnswerDetails.setProfiledCategoryClientStatementsList(list);
+        return profiledClientAnswerDetails;
     }
 
     //TODO sorting by count
-    private ProfiledClientAnswer mapToProfiledClientAnswer(ClientAnswer clientAnswer) {
-        return new ProfiledClientAnswer(
+    private ProfiledClientAnswerDetails mapToProfiledClientAnswer(ClientAnswer clientAnswer) {
+        return new ProfiledClientAnswerDetails(
                 clientAnswer.getClientName(),
                 clientAnswer.getClientId(),
                 clientAnswer.getSubmissionId(),
                 clientAnswer.getSubmissionDate(),
                 clientAnswer.getTestName(),
                 mapToProfiledCategoryClientStatements(clientAnswer.getClientStatementList())
+        );
+    }
+
+    private ProfiledClientAnswerShort mapToProfiledClientAnswerShort(ClientAnswer clientAnswer) {
+        return new ProfiledClientAnswerShort(
+                clientAnswer.getClientName(),
+                clientAnswer.getClientId(),
+                clientAnswer.getSubmissionId(),
+                clientAnswer.getSubmissionDate(),
+                clientAnswer.getTestName()
         );
     }
 

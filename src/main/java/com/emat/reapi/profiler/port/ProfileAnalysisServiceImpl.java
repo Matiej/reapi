@@ -20,6 +20,7 @@ public class ProfileAnalysisServiceImpl implements ProfileAnalysisService {
 
     @Override
     public Mono<InsightReportAiResponse> analyzeSubmission(String submissionId, boolean force, PayloadMode mode, int retry) {
+        //todo dopisac usage of existing report.
         Mono<InsightReport> existing = reportRepository.findBySubmissionId(submissionId)
                 .map(InsightReportDocument::toDomain);
 
@@ -30,6 +31,7 @@ public class ProfileAnalysisServiceImpl implements ProfileAnalysisService {
                     var report = InsightReport.of(
                             submissionId,
                             resposne.getClientId(),
+                            resposne.getClientName(),
                             resposne.getTestName(),
                             resposne.getModel(),
                             resposne.getSchemaName(),

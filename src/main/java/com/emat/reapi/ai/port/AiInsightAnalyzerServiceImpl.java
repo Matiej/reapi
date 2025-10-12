@@ -30,7 +30,7 @@ public class AiInsightAnalyzerServiceImpl implements AiInsightAnalyzerService {
     private final OpenAiClientFactory openAiClientFactory;
     private final SchemaRegistry schemaRegistry;
     private final SchemaJsonValidator validator;
-    private final ObjectMapper om;
+    private final ObjectMapper objectMapper;
 
     private static final String SCHEMA_NAME = "InsightReport";
     private static final String SCHEMA_VERSION = "v1";
@@ -40,10 +40,12 @@ public class AiInsightAnalyzerServiceImpl implements AiInsightAnalyzerService {
     public Mono<InsightReportAiResponse> analyze(MinimizedPayload payload) {
         return Mono.fromSupplier(() -> doCall(payload, false))
                 .subscribeOn(Schedulers.boundedElastic())
-                .timeout(Duration.ofSeconds(90))
+                .timeout(Duration.ofSeconds(120)) //todo poprawic
+                .doOnSuccess(suc -> log.info("successfully analyzed payload: {}", suc.getSubmissionId()))
                 .onErrorResume(ex -> {
                     log.warn("AI call failed ({}). Retrying with stricter instruction…", ex.getMessage());
-                    return Mono.fromSupplier(() -> doCall(payload, true));
+                    return Mono.fromSupplier(() -> doCall(payload, true))
+                            .doOnSuccess(suc -> log.info("successfully analyzed payload after fall: {}", suc.getSubmissionId()));
                 });
     }
 
@@ -80,7 +82,7 @@ public class AiInsightAnalyzerServiceImpl implements AiInsightAnalyzerService {
 
     private String write(Object o) {
         try {
-            return om.writeValueAsString(o);
+            return objectMapper.writeValueAsString(o);
         } catch (Exception e) {
             throw new IllegalStateException("Cannot serialize payload", e);
         }
@@ -88,7 +90,7 @@ public class AiInsightAnalyzerServiceImpl implements AiInsightAnalyzerService {
 
     private <T> T read(String json, Class<T> type) {
         try {
-            return om.readValue(json, type);
+            return objectMapper.readValue(json, type);
         } catch (Exception e) {
             throw new IllegalStateException("Cannot deserialize AI response", e);
         }

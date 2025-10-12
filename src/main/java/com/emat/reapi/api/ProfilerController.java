@@ -1,7 +1,7 @@
 package com.emat.reapi.api;
 
-import com.emat.reapi.api.dto.ClientAnswerResponse;
-import com.emat.reapi.profiler.domain.ProfiledClientAnswer;
+import com.emat.reapi.profiler.domain.ProfiledClientAnswerDetails;
+import com.emat.reapi.profiler.domain.ProfiledClientAnswerShort;
 import com.emat.reapi.profiler.domain.report.InsightReportAiResponse;
 import com.emat.reapi.profiler.domain.report.PayloadMode;
 import com.emat.reapi.profiler.port.ProfileAnalysisService;
@@ -15,6 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 
 @RestController
@@ -47,8 +49,19 @@ public class ProfilerController {
             description = "Retrieves all profiled clients answers ",
             responses = @ApiResponse(responseCode = "200", description = "Retrieved successfully")
     )
+    @GetMapping
+    public Mono<List<ProfiledClientAnswerShort>> answeredStatements() {
+        log.info("Received request: GET /api/profiler to retrieve profiled ALL clients answer");
+        return profiledService.getProfiledStatements();
+    }
+
+    @Operation(
+            summary = "Get all profiled statement by submissionID",
+            description = "Retrieves all profiled clients answers",
+            responses = @ApiResponse(responseCode = "200", description = "Retrieved successfully")
+    )
     @GetMapping("/{submissionId}")
-    public Mono<ProfiledClientAnswer> answeredStatements(
+    public Mono<ProfiledClientAnswerDetails> answeredStatementBySubmissionId(
             @PathVariable String submissionId
     ) {
         log.info("Received request: GET /api/profiler to retrieve profiled client answer for submission ID: {}", submissionId);

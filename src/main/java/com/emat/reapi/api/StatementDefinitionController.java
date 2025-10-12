@@ -1,6 +1,7 @@
 package com.emat.reapi.api;
 
 import com.emat.reapi.api.dto.StatementDefinitionDto;
+import com.emat.reapi.statement.domain.StatementCategory;
 import com.emat.reapi.statement.domain.StatementDefinition;
 import com.emat.reapi.statement.port.StatementDefinitionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,17 +17,19 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/fistStatement")
+@RequestMapping("/api/definition")
 @Slf4j
 @AllArgsConstructor
 @Validated
-@Tag(name = "Statement", description = "Endpoints for managing client fistStatement definitions")
+@Tag(name = "Statement", description = "Endpoints for managing client statement definitions")
 public class StatementDefinitionController {
     private final StatementDefinitionService statementService;
 
     @Operation(
-            summary = "Save fistStatement definition",
+            summary = "Save statement definition",
             description = "Adds a new fistStatement definition to the system",
             responses = {
                     @ApiResponse(responseCode = "201", description = "Statement definition saved successfully"),
@@ -45,30 +48,33 @@ public class StatementDefinitionController {
     }
 
     @Operation(
-            summary = "Get all fistStatement definitions",
+            summary = "Get all statement definitions",
             description = "Retrieves all fistStatement definitions from the system",
             responses = @ApiResponse(responseCode = "200", description = "List retrieved successfully")
     )
     @GetMapping()
     public Flux<StatementDefinitionDto> getAllStatements() {
-        log.info("received request: GET /api/fistStatement");
+        log.info("received request: GET /api/statement");
         return statementService.getAllStatementDefinitions()
                 .map(StatementDefinitionDto::toDto);
     }
 
     @Operation(
-            summary = "Get fistStatement definitions by category",
+            summary = "Get statement definitions by category",
             description = "Retrieves fistStatement definitions filtered by category",
             responses = @ApiResponse(responseCode = "200", description = "List retrieved successfully")
     )
     @GetMapping(value = "/category", params = "category")
-    public Flux<StatementDefinitionDto> getStatementsByCategory(
+    public Mono<List<StatementDefinitionDto>> getStatementsByCategory(
             @Parameter(description = "Category to filter definitions")
-            @RequestParam String category
+            @RequestParam StatementCategory category
     ) {
-        log.info("received request: GET /api/fistStatement/statements with 'category': {}", category);
+        log.info("received request: GET /api/statement/statements with 'category': {}", category);
         return statementService.getStatementDefinitionsByCategory(category)
-                .map(StatementDefinitionDto::toDto);
+                .map(it -> it
+                        .stream()
+                        .map(StatementDefinitionDto::toDto)
+                        .toList());
     }
 
 }

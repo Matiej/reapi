@@ -42,6 +42,7 @@ public class TallyWebhookController {
         return tallyService.processTallyEvent(event)
                 .doOnSubscribe(s -> log.info("Processing Tally event..."))
                 .thenReturn(ResponseEntity.ok().build())
+                .doOnSuccess(s-> log.info("Tally event processed successfully, submissionID: {}", event.getData().getSubmissionId()))
                 .onErrorResume(e -> {
                     log.error("Error while processing Tally event", e);
                     return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());

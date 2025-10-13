@@ -1,0 +1,13 @@
+spring:
+  config:
+    import: file:///G:/javaProjects/CONFIG/profiler/profiler-application.yml
+
+  data:
+    mongodb:
+      uri: mongodb://profiler_app:${MONGO_PWD}@192.168.50.34:27017/profiler?authSource=profiler
+
+logging:
+  level:
+    root: INFO
+    com.emat.reapi.ai.configuration: DEBUG
+    org.springframework.web.reactive.function.client: TRACE

@@ -3,12 +3,20 @@ spring:
     endpoints:
       web:
         exposure:
-          include: health,info
+          include: health,info,logfile
     endpoint:
+      logfile:
+        enabled: true
       health:
         probes:
           enabled: true
         show-details: never
+  logging:
+    file:
+      name: /app/logs/profiler-backend.log
+    level:
+      root: INFO
+      org.springframework.web.reactive.function.client: WARN
   config:
     import: optional:file:/config/profiler-application.yml
 #    in docker, mounted from server file path in opt/

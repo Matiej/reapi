@@ -2,35 +2,23 @@ spring:
   application:
     name: @project.name@
   output:
-    ansi:
-      enabled: always
+    ansi.enabled: always
+
   data:
     mongodb:
-      host: localhost
-      port: 27018
-      database: reapi_mongo_db
       auto-index-creation: true
-  ai:
-    openai:
-      api-key: ${OPENAI_API_KEY}
-      base-url: https://api.openai.com/
-  logging:
-    level:
-    com.emat.reapi.ai.configuration: DEBUG
-    org.springframework.web.reactive.function.client: TRACE
-    org.springframework.web.client.RestClient: TRACE
-    org.springframework.http.client: TRACE
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web.reactive.function.client: WARN
 
 springdoc:
-  swagger-ui:
-    path: /docs
-
-app:
-  version: @project.version@
-  name: @project.name@
+  swagger-ui.path: /docs
 
 server:
   port: 8100
 
-tally:
-  signing-secret: ${SIGNING_SECRET_KEY}
+app:
+  version: @project.version@
+  name: @project.name@

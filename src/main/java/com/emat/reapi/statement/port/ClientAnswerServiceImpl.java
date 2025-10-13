@@ -45,7 +45,7 @@ class ClientAnswerServiceImpl implements ClientAnswerService {
         return clientAnswerRepository.findClientAnswerDocumentBySubmissionId(submissionId)
                 .map(ClientAnswerDocument::toDomain)
                 .doOnError(error -> log.error("Error retrieving client test answers"))
-                .doOnSuccess(it -> log.info("Retrieved client test for submission Id: {}", it.getSubmissionId())
+                .doOnSuccess(it -> log.info("Retrieved client test for submission Id: {}", it != null ? it.getSubmissionId() : "No submissions found for " + submissionId)
                 );
     }
 

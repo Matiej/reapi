@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/webhooks/tally")
 @RequiredArgsConstructor
@@ -21,7 +23,7 @@ public class TallyWebhookController {
     private final TallyService tallyService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<Object>> handleTallyHook(
+    public Mono<ResponseEntity<Map<String, String>>> handleTallyHook(
             @RequestHeader(value = "Tally-Signature", required = false) String signature,
             @RequestBody String rawBody
     ) {
@@ -36,16 +38,16 @@ public class TallyWebhookController {
             event = objectMapper.readValue(rawBody, TallyWebhookEvent.class);
         } catch (Exception e) {
             log.error("Parse error", e);
-            return Mono.just(ResponseEntity.badRequest().build());
+            return Mono.just(ResponseEntity.badRequest().body(Map.of("status", "bad_request")));
         }
 
         return tallyService.processTallyEvent(event)
                 .doOnSubscribe(s -> log.info("Processing Tally event..."))
-                .thenReturn(ResponseEntity.ok().build())
+                .thenReturn(ResponseEntity.ok().body(Map.of("status", "ok")))
                 .doOnSuccess(s-> log.info("Tally event processed successfully, submissionID: {}", event.getData().getSubmissionId()))
                 .onErrorResume(e -> {
                     log.error("Error while processing Tally event", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("status", "error")));
                 });
     }
 }

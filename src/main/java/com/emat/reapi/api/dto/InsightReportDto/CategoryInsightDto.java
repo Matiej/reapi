@@ -1,7 +1,5 @@
 package com.emat.reapi.api.dto.InsightReportDto;
 
-import com.emat.reapi.profiler.domain.report.RecommendedIntervention;
-
 import java.util.List;
 
 public record CategoryInsightDto(

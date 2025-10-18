@@ -1,6 +1,5 @@
 package com.emat.reapi.profiler.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 

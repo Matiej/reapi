@@ -3,7 +3,6 @@ package com.emat.reapi.api;
 
 import com.emat.reapi.api.dto.InsightReportDto.InsightReportDto;
 import com.emat.reapi.api.dto.InsightReportDto.InsightReportMapper;
-import com.emat.reapi.profiler.domain.report.InsightReport;
 import com.emat.reapi.profiler.port.ProfileAnalysisService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

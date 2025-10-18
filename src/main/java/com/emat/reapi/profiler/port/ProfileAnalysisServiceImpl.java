@@ -1,8 +1,6 @@
 package com.emat.reapi.profiler.port;
 
-import com.emat.reapi.ai.port.AiInsightAnalyzerService;
 import com.emat.reapi.profiler.domain.report.InsightReport;
-import com.emat.reapi.profiler.domain.report.InsightReportAiResponse;
 import com.emat.reapi.profiler.domain.report.PayloadMode;
 import com.emat.reapi.profiler.infra.InsightReportDocument;
 import com.emat.reapi.profiler.infra.InsightReportRepository;
@@ -17,33 +15,11 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class ProfileAnalysisServiceImpl implements ProfileAnalysisService {
-    private final ProfiledService profiledService;
-    private final MinimizerService minimizerService;
-    private final AiInsightAnalyzerService aiAnalyzer;
     private final InsightReportRepository reportRepository;
 
     @Override
-    public Mono<InsightReportAiResponse> analyzeSubmission(String submissionId, boolean force, PayloadMode mode, int retry) {
-
-        return profiledService.getClientProfiledStatement(submissionId)
-                .flatMap(pca -> minimizerService.minimize(pca, mode))
-                .flatMap(aiAnalyzer::analyze)
-                .flatMap(resposne -> {
-                    var report = InsightReport.of(
-                            submissionId,
-                            resposne.getClientId(),
-                            resposne.getClientName(),
-                            resposne.getTestName(),
-                            resposne.getModel(),
-                            resposne.getSchemaName(),
-                            resposne.getSchemaVersion(),
-                            resposne.getRawJson(),
-                            resposne.getDate(),
-                            resposne.getInsightReportStructuredAiResponse()
-                    );
-                    return reportRepository.save(InsightReportDocument.from(report))
-                            .thenReturn(resposne);
-                });
+    public Mono<Void> saveReport(InsightReport insightReport) {
+        return reportRepository.save(InsightReportDocument.from(insightReport)).then();
     }
 
     @Override
@@ -58,6 +34,13 @@ public class ProfileAnalysisServiceImpl implements ProfileAnalysisService {
                 .doOnSuccess(result -> log.info("Fetched {} reports from data base for submissionId: {}",
                         result.isEmpty() ? 0 : result.size(),
                         submissionId));
+    }
+
+    @Override
+    public Mono<Boolean> isAnalysed(String submissionId) {
+        log.info("Checking if any report exists for submissionId: {}", submissionId);
+        return reportRepository.existsBySubmissionId(submissionId)
+                .doOnSuccess(s -> log.info("Insight reports for submissionId: {}, exist: {}", submissionId, s));
     }
 }
 

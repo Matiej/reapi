@@ -6,10 +6,7 @@ import com.emat.reapi.ai.validator.SchemaJsonValidator;
 import com.emat.reapi.profiler.domain.MinimizedPayload;
 import com.emat.reapi.profiler.domain.report.InsightReportAiResponse;
 import com.emat.reapi.profiler.domain.report.InsightReportStructuredAiResponse;
-
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;

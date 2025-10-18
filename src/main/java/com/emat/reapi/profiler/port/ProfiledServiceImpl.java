@@ -52,9 +52,9 @@ class ProfiledServiceImpl implements ProfiledService {
                 .flatMapMany(Flux::fromIterable)
                 .flatMap(clientAnswer -> profileAnalysisService.isAnalysed(clientAnswer.getSubmissionId())
                         .map(isAnalyzed -> mapToProfiledClientAnswerShort(clientAnswer, isAnalyzed)))
+                .sort(Comparator.comparing(ProfiledClientAnswerShort::submissionDate))
                 .collectList()
                 .doOnSuccess(list -> log.info("Total profiled answers: {}", list.size()));
-
     }
 
     @Override

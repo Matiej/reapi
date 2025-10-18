@@ -5,7 +5,6 @@ import com.emat.reapi.statement.domain.StatementDefinition;
 import com.emat.reapi.statement.domain.StatementType;
 import com.emat.reapi.statement.domain.StatementTypeDefinition;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;

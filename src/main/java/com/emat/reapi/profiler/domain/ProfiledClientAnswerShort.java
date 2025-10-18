@@ -7,6 +7,7 @@ public record ProfiledClientAnswerShort(
         String clientId,
         String submissionId,
         Instant submissionDate,
-        String testName
+        String testName,
+        Boolean isAnalyzed
 ) {
 }

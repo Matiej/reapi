@@ -1,6 +1,5 @@
 package com.emat.reapi.profiler.domain;
 
-import com.emat.reapi.statement.domain.ClientStatement;
 import com.emat.reapi.statement.domain.Statement;
 import com.emat.reapi.statement.domain.StatementType;
 import lombok.AllArgsConstructor;

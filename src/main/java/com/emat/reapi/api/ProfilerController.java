@@ -2,7 +2,6 @@ package com.emat.reapi.api;
 
 import com.emat.reapi.profiler.domain.ProfiledClientAnswerDetails;
 import com.emat.reapi.profiler.domain.ProfiledClientAnswerShort;
-import com.emat.reapi.profiler.domain.report.InsightReportAiResponse;
 import com.emat.reapi.profiler.domain.report.PayloadMode;
 import com.emat.reapi.profiler.port.ProfileAnalysisService;
 import com.emat.reapi.profiler.port.ProfiledService;
@@ -11,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,13 +35,15 @@ public class ProfilerController {
             responses = @ApiResponse(responseCode = "200", description = "Retrieved successfully")
     )
     @PostMapping(value = "/{submissionId}/analysis", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<InsightReportAiResponse> analyze(
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<Void> analyze(
             @PathVariable String submissionId,
             @RequestParam(defaultValue = "false") boolean force,
             @RequestParam(defaultValue = "MINIMAL") PayloadMode mode,
             @RequestParam(defaultValue = "1") int retry
     ) {
-        return analysisService.analyzeSubmission(submissionId, force, mode, retry);
+        return profiledService.analyzeProfiledStatement(submissionId, force, mode, retry)
+                .then();
     }
 
     @Operation(

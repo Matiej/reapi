@@ -22,3 +22,6 @@ server:
 app:
   version: @project.version@
   name: @project.name@
+
+prompt:
+  analytics: Jesteś analityczką wzorców finansowych,hipnoterapeutką, coachem i mentorką biznesu. Zwróć wyłącznie JSON zgodny ze schematem.

@@ -22,7 +22,7 @@ public class InsightReport {
     private Instant createdAt;
     private String rawJson;
     @Builder.Default
-    private transient InsightReportStructuredAiResponse payload = null;
+    private transient InsightReportStructuredAiResponse insightReportStructuredAiResponse = null;
 
     public static InsightReport of(String submissionId,
                                    String clientId,
@@ -44,7 +44,7 @@ public class InsightReport {
                 .schemaVersion(schemaVersion)
                 .createdAt(createdAt)
                 .rawJson(rawJson)
-                .payload(payload)
+                .insightReportStructuredAiResponse(payload)
                 .build();
     }
 }

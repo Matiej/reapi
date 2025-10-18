@@ -15,6 +15,7 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -23,7 +24,6 @@ import java.time.Duration;
 import java.util.List;
 
 @Slf4j
-@AllArgsConstructor
 @Service
 public class AiInsightAnalyzerServiceImpl implements AiInsightAnalyzerService {
 
@@ -35,6 +35,15 @@ public class AiInsightAnalyzerServiceImpl implements AiInsightAnalyzerService {
     private static final String SCHEMA_NAME = "InsightReport";
     private static final String SCHEMA_VERSION = "v1";
     private static final OpenAiApi.ChatModel MODEL = OpenAiApi.ChatModel.GPT_4_O_MINI;
+    @Value("${prompt.analytics}")
+    private String userPrompt;
+
+    public AiInsightAnalyzerServiceImpl(OpenAiClientFactory openAiClientFactory, SchemaRegistry schemaRegistry, SchemaJsonValidator validator, ObjectMapper objectMapper) {
+        this.openAiClientFactory = openAiClientFactory;
+        this.schemaRegistry = schemaRegistry;
+        this.validator = validator;
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public Mono<InsightReportAiResponse> analyze(MinimizedPayload payload) {
@@ -55,11 +64,12 @@ public class AiInsightAnalyzerServiceImpl implements AiInsightAnalyzerService {
         var options = openAiClientFactory.structuredOutputOptions(MODEL, SCHEMA_NAME, schemaJson, true);
 
         //todo refactor prompts, prepare some yml with them or so (allow to add from with request
-        var system = new SystemMessage
-                (fixPass
-                        ? "Zwróć wyłącznie JSON zgodny z dostarczonym schematem. Bez komentarzy, tylko JSON."
-                        : "Jesteś analityczką wzorców finansowych. Zwróć wyłącznie JSON zgodny ze schematem."
-                );
+//        var system = new SystemMessage
+//                (fixPass
+//                        ? "Zwróć wyłącznie JSON zgodny z dostarczonym schematem. Bez komentarzy, tylko JSON."
+//                        : "Jesteś analityczką wzorców finansowych. Zwróć wyłącznie JSON zgodny ze schematem."
+//                );
+        var system = new SystemMessage(userPrompt);
         var user = new UserMessage(write(payload));
 
         Prompt prompt = new Prompt(List.of(system, user), options);

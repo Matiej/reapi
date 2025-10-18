@@ -7,9 +7,13 @@ import com.emat.reapi.profiler.domain.report.PayloadMode;
 import com.emat.reapi.profiler.infra.InsightReportDocument;
 import com.emat.reapi.profiler.infra.InsightReportRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
+@Slf4j
 @Service
 @AllArgsConstructor
 public class ProfileAnalysisServiceImpl implements ProfileAnalysisService {
@@ -20,9 +24,6 @@ public class ProfileAnalysisServiceImpl implements ProfileAnalysisService {
 
     @Override
     public Mono<InsightReportAiResponse> analyzeSubmission(String submissionId, boolean force, PayloadMode mode, int retry) {
-        //todo dopisac usage of existing report.
-        Mono<InsightReport> existing = reportRepository.findBySubmissionId(submissionId)
-                .map(InsightReportDocument::toDomain);
 
         return profiledService.getClientProfiledStatement(submissionId)
                 .flatMap(pca -> minimizerService.minimize(pca, mode))
@@ -43,13 +44,20 @@ public class ProfileAnalysisServiceImpl implements ProfileAnalysisService {
                     return reportRepository.save(InsightReportDocument.from(report))
                             .thenReturn(resposne);
                 });
-
     }
 
     @Override
-    public Mono<InsightReport> getAnalysis(String submissionId) {
-        return reportRepository.findBySubmissionId(submissionId)
-                .map(InsightReportDocument::toDomain);
+    public Mono<List<InsightReport>> getAnalysis(String submissionId) {
+        log.info("Trying to fetch from reports for submissionId: {}", submissionId);
+        return reportRepository.findAllBySubmissionId(submissionId)
+                .collectList()
+                .map(results -> results.
+                        stream()
+                        .map(InsightReportDocument::toDomain)
+                        .toList())
+                .doOnSuccess(result -> log.info("Fetched {} reports from data base for submissionId: {}",
+                        result.isEmpty() ? 0 : result.size(),
+                        submissionId));
     }
 }
 

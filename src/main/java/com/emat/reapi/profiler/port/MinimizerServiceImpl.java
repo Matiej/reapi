@@ -62,8 +62,8 @@ public class MinimizerServiceImpl implements MinimizerService {
         String categoryId = safe(() -> profiledCategoryClientStatements.getCategory().getCategoryName(), "UNKNOWN_CATEGORY");
         String labelPl = safe(() -> profiledCategoryClientStatements.getCategory().getDescription(), categoryId);
 
-        int limitingTrue = safeInt(profiledCategoryClientStatements.getTotalLimiting());
-        int supportingTrue = safeInt(profiledCategoryClientStatements.getTotalSupporting());
+        int limitingTrue = profiledCategoryClientStatements.getTotalLimiting();
+        int supportingTrue = profiledCategoryClientStatements.getTotalSupporting();
         double balance = calcBalance(limitingTrue, supportingTrue);
 
         int limitPerType = switch (mode) {
@@ -108,10 +108,6 @@ public class MinimizerServiceImpl implements MinimizerService {
         int total = limiting + supporting;
         return total == 0 ? 0.5d : ((double) supporting) / total;
     }
-//todo do wyjebania moze
-    private static int safeInt(Integer v) {
-        return v == null ? 0 : v;
-    }
 
     private static <T> T safe(SupplierEx<T> s, T fallback) {
         try {
@@ -131,10 +127,10 @@ public class MinimizerServiceImpl implements MinimizerService {
                 .sorted(Comparator
                         // 1) po rosnącym balanceIndex (im mniejszy, tym "gorzej")
                         .comparingDouble((ProfiledCategoryClientStatements c) ->
-                                calcBalance(safeInt(c.getTotalLimiting()), safeInt(c.getTotalSupporting())))
+                                calcBalance(c.getTotalLimiting(), c.getTotalSupporting()))
                         // 2) przy remisie – więcej aktywnych (limiting+supporting) ma wyższy priorytet
                         .thenComparingInt((ProfiledCategoryClientStatements c) ->
-                                -(safeInt(c.getTotalLimiting()) + safeInt(c.getTotalSupporting()))))
+                                -(c.getTotalLimiting() + c.getTotalSupporting())))
                 .limit(Math.max(0, k))
                 .map(c -> safe(() -> c.getCategory().getCategoryName(), "UNKNOWN_CATEGORY"))
                 .collect(Collectors.toCollection(LinkedHashSet::new)); // ORDER, keeep order

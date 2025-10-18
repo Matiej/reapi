@@ -1,7 +1,6 @@
 package com.emat.reapi.profiler.infra;
 
 import com.emat.reapi.profiler.domain.report.InsightReport;
-import com.emat.reapi.profiler.domain.report.InsightReportAiResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,7 +39,7 @@ public class InsightReportDocument {
         doc.setSchemaName(report.getSchemaName());
         doc.setSchemaVersion(report.getSchemaVersion());
         doc.setReportJson(report.getRawJson());
-        doc.setInsightReportStructuredAiDocument(InsightReportStructuredAiDocument.from(report.getPayload()));
+        doc.setInsightReportStructuredAiDocument(InsightReportStructuredAiDocument.from(report.getInsightReportStructuredAiResponse()));
         doc.setCreatedAt(report.getCreatedAt() != null ? report.getCreatedAt() : Instant.now());
         return doc;
     }
@@ -56,6 +55,7 @@ public class InsightReportDocument {
                 .schemaVersion(schemaVersion)
                 .createdAt(createdAt)
                 .rawJson(reportJson)
+                .insightReportStructuredAiResponse(insightReportStructuredAiDocument.toDomain())
                 .build();
     }
 

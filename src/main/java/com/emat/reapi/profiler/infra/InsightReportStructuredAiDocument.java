@@ -45,13 +45,13 @@ public class InsightReportStructuredAiDocument {
 
     public InsightReportStructuredAiResponse toDomain() {
         return InsightReportStructuredAiResponse.builder()
-                .clientSummary(
-                        clientSummary != null ? clientSummary.toDomain() : null
-                )
-                .categoryInsights(
-                        categoryInsights != null
-                                ? categoryInsights.stream().map(CategoryInsightDocument::toDomain).collect(Collectors.toList())
-                                : null
+                .clientSummary(clientSummary != null ? clientSummary.toDomain() : null)
+                .categoryInsights(categoryInsights != null
+                        ? categoryInsights
+                        .stream()
+                        .map(CategoryInsightDocument::toDomain)
+                        .toList()
+                        : null
                 )
                 .nextSteps(nextSteps)
                 .build();

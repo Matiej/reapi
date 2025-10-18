@@ -55,10 +55,12 @@ public class CategoryInsightDocument {
                 .strengthsPl(strengthsPl)
                 .risksPl(risksPl)
                 .contradictionsPl(contradictionsPl)
-                .recommendedInterventions(
-                        recommendedInterventions != null
-                                ? recommendedInterventions.stream().map(RecommendedInterventionDocument::toDomain).collect(Collectors.toList())
-                                : null
+                .recommendedInterventions(recommendedInterventions != null
+                        ? recommendedInterventions
+                        .stream()
+                        .map(RecommendedInterventionDocument::toDomain)
+                        .toList()
+                        : null
                 )
                 .build();
     }

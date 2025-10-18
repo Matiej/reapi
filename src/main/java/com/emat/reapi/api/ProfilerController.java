@@ -24,7 +24,7 @@ import java.util.List;
 @Slf4j
 @AllArgsConstructor
 @Validated
-@Tag(name = "Profiler", description = "Endpoints for profile client answers")
+@Tag(name = "Profiler", description = "Endpoints for profiled client answers")
 public class ProfilerController {
     private final ProfiledService profiledService;
     private final ProfileAnalysisService analysisService;

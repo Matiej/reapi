@@ -1,7 +1,6 @@
 package com.emat.reapi.profiler.port;
 
 import com.emat.reapi.profiler.domain.report.InsightReport;
-import com.emat.reapi.profiler.domain.report.PayloadMode;
 import com.emat.reapi.profiler.infra.InsightReportDocument;
 import com.emat.reapi.profiler.infra.InsightReportRepository;
 import lombok.AllArgsConstructor;

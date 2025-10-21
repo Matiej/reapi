@@ -8,7 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -24,7 +26,7 @@ public class ProfileAnalysisServiceImpl implements ProfileAnalysisService {
     @Override
     public Mono<List<InsightReport>> getAnalysis(String submissionId) {
         log.info("Trying to fetch from reports for submissionId: {}", submissionId);
-        return reportRepository.findAllBySubmissionId(submissionId)
+        return reportRepository.findBySubmissionIdOrderByCreatedAtDesc(submissionId)
                 .collectList()
                 .map(results -> results.
                         stream()
@@ -36,10 +38,8 @@ public class ProfileAnalysisServiceImpl implements ProfileAnalysisService {
     }
 
     @Override
-    public Mono<Boolean> isAnalysed(String submissionId) {
-        log.info("Checking if any report exists for submissionId: {}", submissionId);
-        return reportRepository.existsBySubmissionId(submissionId)
-                .doOnSuccess(s -> log.info("Insight reports for submissionId: {}, exist: {}", submissionId, s));
+    public Mono<Set<String>> getAllSubmissionIds() {
+        return reportRepository.distinctSubmissionIdsAll().collectList().map(HashSet::new);
     }
 }
 

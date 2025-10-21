@@ -7,6 +7,7 @@ import com.emat.reapi.statement.domain.*;
 import com.emat.reapi.statement.port.ClientAnswerService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -46,16 +47,31 @@ class ProfiledServiceImpl implements ProfiledService {
     }
 
     @Override
-    public Mono<List<ProfiledClientAnswerShort>> getProfiledStatements() {
-        return clientAnswerService.getAllAnsweredStatements()
-                .flatMapMany(Flux::fromIterable)
-                .flatMap(clientAnswer -> profileAnalysisService.isAnalysed(clientAnswer.getSubmissionId())
-                        .map(isAnalyzed -> mapToProfiledClientAnswerShort(clientAnswer, isAnalyzed)))
-                .sort(Comparator.comparing(ProfiledClientAnswerShort::submissionDate))
-                .collectList()
-                .doOnSuccess(list -> log.info("Total profiled answers: {}", list.size()));
-    }
+    public Mono<List<ProfiledClientAnswerShort>> getProfiledShort(Sort sort) {
+        Sort effectiveSort = (sort == null || sort.isUnsorted())
+                ? Sort.by(Sort.Direction.DESC, "submissionDate")
+                : sort;
 
+        return clientAnswerService.getAllAnsweredShortProjections(effectiveSort)
+                .collectList()
+                .flatMap(list -> profileAnalysisService.getAllSubmissionIds()
+                        .map(analyzedSet ->
+                                list.stream()
+                                        .map(p -> new ProfiledClientAnswerShort(
+                                                p.getClientName(),
+                                                p.getClientId(),
+                                                p.getSubmissionId(),
+                                                p.getSubmissionDate(),
+                                                p.getTestName(),
+                                                analyzedSet.contains(p.getSubmissionId())
+                                        ))
+                                        .toList()
+                        )
+                )
+                .doOnSuccess(list -> log.info("ProfiledShort ready: {} items (sort={})", list.size(), effectiveSort))
+                .doOnError(e -> log.error("Error building profiled short list", e));
+    }
+    
     @Override
     public Mono<InsightReport> analyzeProfiledStatement(String submissionId, boolean force, PayloadMode mode, int retry) {
         return getClientProfiledStatement(submissionId)

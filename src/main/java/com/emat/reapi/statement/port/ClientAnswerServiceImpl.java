@@ -4,9 +4,12 @@ import com.emat.reapi.api.dto.ClientAnswerDto;
 import com.emat.reapi.statement.domain.ClientAnswer;
 import com.emat.reapi.statement.infra.ClientAnswerDocument;
 import com.emat.reapi.statement.infra.ClientAnswerRepository;
+import com.emat.reapi.statement.infra.ClientAnswerShortProjection;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -37,6 +40,12 @@ class ClientAnswerServiceImpl implements ClientAnswerService {
                 .doOnError(error -> log.error("Error retrieving client test answers"))
                 .doOnSuccess(it -> log.info("Retrieved {} client tests", it.size())
                 );
+    }
+
+    @Override
+    public Flux<ClientAnswerShortProjection> getAllAnsweredShortProjections(Sort sort) {
+        return clientAnswerRepository.findAllProjectedBy(sort)
+                .doOnError(error -> log.error("Error retrieving client test answers", error));
     }
 
     @Override

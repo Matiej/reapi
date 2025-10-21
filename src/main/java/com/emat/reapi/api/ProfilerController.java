@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -53,8 +54,9 @@ public class ProfilerController {
     )
     @GetMapping
     public Mono<List<ProfiledClientAnswerShort>> answeredStatements() {
+        //todo add sorting method from FE
         log.info("Received request: GET /api/profiler to retrieve profiled ALL clients answer");
-        return profiledService.getProfiledStatements();
+        return profiledService.getProfiledShort(Sort.by(Sort.Direction.DESC, "submissionDate"));
     }
 
     @Operation(

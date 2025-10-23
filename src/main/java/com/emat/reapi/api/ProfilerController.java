@@ -1,5 +1,6 @@
 package com.emat.reapi.api;
 
+import com.emat.reapi.api.dto.InsightReportDto.ReportJobStatusDto;
 import com.emat.reapi.profiler.domain.ProfiledClientAnswerDetails;
 import com.emat.reapi.profiler.domain.ProfiledClientAnswerShort;
 import com.emat.reapi.profiler.domain.report.PayloadMode;
@@ -13,10 +14,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 
 
@@ -28,23 +32,37 @@ import java.util.List;
 @Tag(name = "Profiler", description = "Endpoints for profiled client answers")
 public class ProfilerController {
     private final ProfiledService profiledService;
-    private final ProfileAnalysisService analysisService;
 
     @Operation(
             summary = "Send profiled statement to AI analyze",
-            description = "Get and send profiled staement by submmision ID to AI analyze ",
-            responses = @ApiResponse(responseCode = "200", description = "Retrieved successfully")
+            description = "Get and send profiled statement by submission ID to AI analyze ",
+            responses = @ApiResponse(responseCode = "201", description = "Statement sent to analyze")
     )
     @PostMapping(value = "/{submissionId}/analysis", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public Mono<Void> analyze(
+    public Mono<ResponseEntity<Void>> analyze(
             @PathVariable String submissionId,
             @RequestParam(defaultValue = "false") boolean force,
             @RequestParam(defaultValue = "MINIMAL") PayloadMode mode,
             @RequestParam(defaultValue = "1") int retry
     ) {
-        return profiledService.analyzeProfiledStatement(submissionId, force, mode, retry)
-                .then();
+        return profiledService.enqueueStatementToAnalyze(submissionId, mode, force, retry)
+                .map(job -> ResponseEntity.accepted()
+                        .location(URI.create("/api/profiler/analysis/jobs/" + job.getId()))
+                        .build()
+                );
+    }
+
+    @Operation(
+            summary = "Get current latest AI analyze status",
+            description = "Get latest AI analyze status by submissionId for UI functions display",
+            tags = "Job status",
+            responses = @ApiResponse(responseCode = "200", description = "Retrieved successfully")
+    )
+    @GetMapping("/{submissionId}/analysis/status")
+    public Mono<ResponseEntity<ReportJobStatusDto>> latestStatus(@PathVariable String submissionId) {
+        return profiledService.getLatestAnalysisStatus(submissionId)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.noContent().build());
     }
 
     @Operation(

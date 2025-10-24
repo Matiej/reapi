@@ -1,29 +1,19 @@
 package com.emat.reapi.profiler.port;
 
-import com.emat.reapi.api.dto.InsightReportDto.ReportJobStatusDto;
 import com.emat.reapi.profiler.domain.*;
-import com.emat.reapi.profiler.domain.report.PayloadMode;
-import com.emat.reapi.profiler.domain.reportjob.ReportJob;
-import com.emat.reapi.profiler.domain.reportjob.ReportJobStatus;
+import com.emat.reapi.profiler.infra.InsightReportRepository;
 import com.emat.reapi.statement.domain.*;
 import com.emat.reapi.statement.port.ClientAnswerService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,9 +22,7 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 class ProfiledServiceImpl implements ProfiledService {
     private final ClientAnswerService clientAnswerService;
-    private final ProfileAnalysisService profileAnalysisService;
-    private final ProfileAiAnalysisProcessor profileAiAnalysisProcessor;
-    private final ReportJobService reportJobService;
+    private final InsightReportRepository reportRepository;
 
     @Override
     public Mono<ProfiledClientAnswerDetails> getClientProfiledStatements(String clientId) {
@@ -57,9 +45,9 @@ class ProfiledServiceImpl implements ProfiledService {
 
         return clientAnswerService.getAllAnsweredShortProjections(effectiveSort)
                 .collectList()
-                .flatMap(list -> profileAnalysisService.getAllSubmissionIds()
+                .flatMap(list -> reportRepository.distinctSubmissionIdsAll().collectList().map(HashSet::new)
                         .map(analyzedSet ->
-                                list.stream()
+                                list.stream()//todo use maper
                                         .map(p -> new ProfiledClientAnswerShort(
                                                 p.getClientName(),
                                                 p.getClientId(),
@@ -73,109 +61,6 @@ class ProfiledServiceImpl implements ProfiledService {
                 )
                 .doOnSuccess(list -> log.info("ProfiledShort ready: {} items (sort={})", list.size(), effectiveSort))
                 .doOnError(e -> log.error("Error building profiled short list", e));
-    }
-
-    @Override
-    public Mono<ReportJob> enqueueStatementToAnalyze(String submissionId, PayloadMode mode, boolean force, int retry) {
-        return reportJobService.getReportJobBySubmission(submissionId)
-                .flatMap(existing -> {
-                    boolean isActiveJob = existing.getStatus() == ReportJobStatus.PENDING
-                            || existing.getStatus() == ReportJobStatus.RUNNING;
-                    if (!force && isActiveJob) {
-                        return Mono.just(existing);
-                    }
-                    existing.setStatus(ReportJobStatus.PENDING);
-                    existing.setMode(mode);
-                    existing.setError(null);
-                    existing.setExpireAt(null);
-                    return reportJobService.save(existing);
-                })
-                .switchIfEmpty(
-                        reportJobService.save(ReportJob.builder()
-                                .submissionId(submissionId)
-                                .mode(mode)
-                                .status(ReportJobStatus.PENDING)
-                                .expireAt(null)
-                                .build()
-                        ))
-                .doOnSuccess(job -> asyncAnalyzeProfiledStatement(job, retry)
-                        .subscribe());
-    }
-
-    private Mono<Void> asyncAnalyzeProfiledStatement(ReportJob job, int retry) {
-        var submissionId = job.getSubmissionId();
-        var mode = job.getMode();
-        return reportJobService.save(changeJobStatus(job, ReportJobStatus.RUNNING, null, null))
-                .then(getClientProfiledStatement(submissionId))
-                .doOnSubscribe(s -> log.info("AI analysis START: submissionId={}, mode={}, retry={}",
-                        submissionId,
-                        mode,
-                        retry))
-                .flatMap(statement -> profileAiAnalysisProcessor.sendSubmissionToAI(statement, mode))
-                .doOnNext(report -> log.info("AI analysis DONE: submissionId={}, model={}, schema={}/{}",
-                        report.getSubmissionId(), report.getModel(), report.getSchemaName(), report.getSchemaVersion()))
-                .delayUntil(report -> {
-                            log.info("Saving report: submissionId={}, createdAt={}",
-                                    report.getSubmissionId(),
-                                    report.getCreatedAt());
-                            return profileAnalysisService.saveReport(report);
-                        }
-                )
-                .doOnSuccess(r -> log.info("Report saved OK: submissionId={}", r.getSubmissionId()))
-                .flatMap(saved -> reportJobService.save(changeJobStatus(
-                        job,
-                        ReportJobStatus.DONE,
-                        Instant.now().plusSeconds(300),
-                        null)))
-                .retryWhen(
-                        Retry.backoff(retry, Duration.ofSeconds(1))
-                                .maxBackoff(Duration.ofSeconds(10))
-                                .jitter(0.2)
-                                .filter(this::isTransientError)
-                                .doBeforeRetry(rs -> log.warn(
-                                        "Retrying AI analysis: attempt={}, submissionId={}, cause={}",
-                                        rs.totalRetries() + 1, submissionId, rs.failure().toString()))
-                                .onRetryExhaustedThrow((spec, signal) ->
-                                        new ResponseStatusException(
-                                                HttpStatus.SERVICE_UNAVAILABLE,
-                                                "AI analysis failed after retries for submissionId=" + submissionId,
-                                                signal.failure()
-                                        )
-                                )
-                )
-                .onErrorResume(ex -> {
-                    log.error("`AI analysis ERROR`: submissionId={}, cause={}", submissionId, ex.toString(), ex);
-                    return reportJobService.save(changeJobStatus(
-                            job,
-                            ReportJobStatus.FAILED,
-                            Instant.now().plusSeconds(300),
-                            ex));
-                }).then();
-    }
-
-    private ReportJob changeJobStatus(ReportJob job, ReportJobStatus status, Instant expiryAt, Throwable error) {
-        job.setStatus(status);
-        job.setError(error != null ? error.getMessage() : null);
-        job.setExpireAt(expiryAt);
-        job.setUpdatedAt(Instant.now());
-        return job;
-    }
-
-    @Override
-    public Mono<ReportJobStatusDto> getLatestAnalysisStatus(String submissionId) {
-        return reportJobService.getReportJobBySubmission(submissionId)
-                .map(job -> ReportJobStatusDto.from(job, Instant.now()));
-    }
-
-    private boolean isTransientError(Throwable t) {
-        if (t instanceof TimeoutException) return true;
-        if (t instanceof IOException) return true;
-        if (t instanceof WebClientResponseException wcre) {
-
-            int code = wcre.getStatusCode().value();
-            return code >= 500 || code == 429;
-        }
-        return false;
     }
 
     private ProfiledClientAnswerDetails sortByTotalLimiting(ProfiledClientAnswerDetails profiledClientAnswerDetails) {

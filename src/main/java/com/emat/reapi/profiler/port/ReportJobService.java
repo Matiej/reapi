@@ -1,7 +1,6 @@
 package com.emat.reapi.profiler.port;
 
 import com.emat.reapi.profiler.domain.reportjob.ReportJob;
-import com.emat.reapi.profiler.infra.ReportJobDocument;
 import com.emat.reapi.profiler.infra.ReportJobRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -8,7 +8,9 @@ import com.emat.reapi.statement.infra.ClientAnswerShortProjection;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -53,9 +55,15 @@ class ClientAnswerServiceImpl implements ClientAnswerService {
         log.info("Trying to retrieve client test by submission Id: {}", submissionId);
         return clientAnswerRepository.findClientAnswerDocumentBySubmissionId(submissionId)
                 .map(ClientAnswerDocument::toDomain)
-                .doOnError(error -> log.error("Error retrieving client test answers"))
-                .doOnSuccess(it -> log.info("Retrieved client test for submission Id: {}", it != null ? it.getSubmissionId() : "No submissions found for " + submissionId)
-                );
+                .doOnNext(a -> log.info("Retrieved client test for submission Id: {}", a.getSubmissionId()))
+                .switchIfEmpty(Mono.defer(() -> {
+                    log.warn("No submissions found for {}", submissionId);
+                    return Mono.error(new ResponseStatusException(
+                            HttpStatus.NOT_FOUND,
+                            "No client statement test found for submissionId=" + submissionId
+                    ));
+                }))
+                .doOnError(error -> log.error("Error retrieving client test answers"));
     }
 
     @Override

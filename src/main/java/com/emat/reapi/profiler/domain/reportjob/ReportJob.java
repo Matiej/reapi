@@ -17,7 +17,6 @@ public class ReportJob {
     private String id;
     private String submissionId;
     private ReportJobStatus status;
-    private String insightReportDocumentId;
     private PayloadMode mode;
     private String error;
     private Instant expireAt;
@@ -29,7 +28,6 @@ public class ReportJob {
                 reportJobDocument.getId(),
                 reportJobDocument.getSubmissionId(),
                 reportJobDocument.getStatus(),
-                reportJobDocument.getInsightReportDocumentId(),
                 reportJobDocument.getMode(),
                 reportJobDocument.getError(),
                 reportJobDocument.getExpireAt(),
@@ -43,10 +41,11 @@ public class ReportJob {
                 id,
                 submissionId,
                 status,
-                insightReportDocumentId,
                 mode,
                 error,
-                expireAt
+                expireAt,
+                createdAt,
+                updatedAt
         );
     }
 }

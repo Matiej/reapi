@@ -17,6 +17,7 @@ public class InsightReport {
     private String clientName;
     private String testName;
     private String model;
+    private PayloadMode payloadMode;
     private String schemaName;
     private String schemaVersion;
     private Instant createdAt;
@@ -29,6 +30,7 @@ public class InsightReport {
                                    String clientName,
                                    String testName,
                                    String model,
+                                   PayloadMode mode,
                                    String schemaName,
                                    String schemaVersion,
                                    String rawJson,
@@ -40,6 +42,7 @@ public class InsightReport {
                 .clientName(clientName)
                 .testName(testName)
                 .model(model)
+                .payloadMode(mode)
                 .schemaName(schemaName)
                 .schemaVersion(schemaVersion)
                 .createdAt(createdAt)

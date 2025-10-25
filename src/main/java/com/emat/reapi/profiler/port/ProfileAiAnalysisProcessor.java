@@ -23,6 +23,7 @@ public class ProfileAiAnalysisProcessor {
                         response.getClientName(),
                         response.getTestName(),
                         response.getModel(),
+                        mode,
                         response.getSchemaName(),
                         response.getSchemaVersion(),
                         response.getRawJson(),

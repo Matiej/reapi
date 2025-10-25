@@ -19,6 +19,7 @@ import reactor.util.retry.Retry;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
@@ -40,6 +41,15 @@ public class ProfileAnalysisServiceImpl implements ProfileAnalysisService {
     public Mono<ReportJobStatusDto> getLatestAnalysisStatus(String submissionId) {
         return reportJobService.getReportJobBySubmission(submissionId)
                 .map(job -> ReportJobStatusDto.from(job, Instant.now()));
+    }
+
+    @Override
+    public Mono<ReportJobStatusDto> getLatestAnalysisStatus() {
+        return reportJobService.findAllJobs()
+                .map(job -> ReportJobStatusDto.from(job, Instant.now()))
+                .filter(p -> p.remainingLockSeconds() != null)
+                .sort(Comparator.comparingLong(ReportJobStatusDto::remainingLockSeconds).reversed())
+                .reduce((a, b) -> a.remainingLockSeconds() > b.remainingLockSeconds() ? a : b);
     }
 
     @Override

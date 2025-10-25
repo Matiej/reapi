@@ -72,8 +72,21 @@ public class ProfileAnalysisReportController {
     )
     @GetMapping("/{submissionId}/status")
     public Mono<ResponseEntity<ReportJobStatusDto>> latestStatus(@PathVariable String submissionId) {
-        log.info("Received request: GET /api/analysis/{submissionId}/status to retrieve profiled client reports for submission ID: {}", submissionId);
+        log.info("Received request: GET /api/analysis/{submissionId}/status to retrieve profiled analyze status for submission ID: {}", submissionId);
         return profileAnalysisService.getLatestAnalysisStatus(submissionId)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.noContent().build());
+    }
+
+    @Operation(
+            summary = "Get current latest AI longest remaining seconds status ",
+            description = "Get latest AI analyze status by submissionId for UI functions display",
+            responses = @ApiResponse(responseCode = "200", description = "Retrieved successfully")
+    )
+    @GetMapping("/status")
+    public Mono<ResponseEntity<ReportJobStatusDto>> latestStatus() {
+        log.info("Received request: GET /api/analysis/status to retrieve longest remaing time status");
+        return profileAnalysisService.getLatestAnalysisStatus()
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.noContent().build());
     }

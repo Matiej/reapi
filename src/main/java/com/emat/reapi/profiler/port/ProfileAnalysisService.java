@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface ProfileAnalysisService {
     Mono<ReportJobStatusDto> getLatestAnalysisStatus(String submissionId);
+    Mono<ReportJobStatusDto> getLatestAnalysisStatus();
 
     Mono<List<InsightReport>> getAnalysis(String submissionId);
     Mono<Void> saveReport(InsightReport insightReport);

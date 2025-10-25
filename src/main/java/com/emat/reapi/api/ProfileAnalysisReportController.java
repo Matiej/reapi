@@ -37,7 +37,7 @@ public class ProfileAnalysisReportController {
     @GetMapping("/{submissionId}")
     @ResponseStatus(HttpStatus.OK)
     public Mono<List<InsightReportDto>> findProfiledClientAnalysisBySubmissionId(@PathVariable String submissionId) {
-        log.info("Received request: GET /api/analysis to retrieve profiled client reports for submission ID: {}", submissionId);
+        log.info("Received request: GET /api/analysis/{submissionId} to retrieve profiled client reports for submission ID: {}", submissionId);
         return profileAnalysisService.getAnalysis(submissionId)
                 .map(results -> results
                         .stream()
@@ -57,6 +57,7 @@ public class ProfileAnalysisReportController {
             @RequestParam(defaultValue = "MINIMAL") PayloadMode mode,
             @RequestParam(defaultValue = "1") int retry
     ) {
+        log.info("Received request: POST /api/analysis/{submissionId} to retrieve profiled client reports for submission ID: {}", submissionId);
         return profileAnalysisService.enqueueStatementToAnalyze(submissionId, mode, force, retry)
                 .map(job -> ResponseEntity.accepted()
                         .location(URI.create("/api/profiler/analysis/jobs/" + job.getId()))
@@ -69,8 +70,9 @@ public class ProfileAnalysisReportController {
             description = "Get latest AI analyze status by submissionId for UI functions display",
             responses = @ApiResponse(responseCode = "200", description = "Retrieved successfully")
     )
-    @GetMapping("/{submissionId}/analysis/status")
+    @GetMapping("/{submissionId}/status")
     public Mono<ResponseEntity<ReportJobStatusDto>> latestStatus(@PathVariable String submissionId) {
+        log.info("Received request: GET /api/analysis/{submissionId}/status to retrieve profiled client reports for submission ID: {}", submissionId);
         return profileAnalysisService.getLatestAnalysisStatus(submissionId)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.noContent().build());

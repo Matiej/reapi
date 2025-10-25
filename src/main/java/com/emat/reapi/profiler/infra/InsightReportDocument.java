@@ -1,6 +1,7 @@
 package com.emat.reapi.profiler.infra;
 
 import com.emat.reapi.profiler.domain.report.InsightReport;
+import com.emat.reapi.profiler.domain.report.PayloadMode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,7 @@ public class InsightReportDocument {
     private String clientId;
     private String testName;
     private String aiModel;
+    private PayloadMode payloadMode;
     private String schemaName;
     private String schemaVersion;
     private String reportJson;
@@ -40,6 +42,7 @@ public class InsightReportDocument {
         doc.setClientId(report.getClientId());
         doc.setTestName(report.getTestName());
         doc.setAiModel(report.getModel());
+        doc.setPayloadMode(report.getPayloadMode());
         doc.setSchemaName(report.getSchemaName());
         doc.setSchemaVersion(report.getSchemaVersion());
         doc.setReportJson(report.getRawJson());
@@ -55,6 +58,7 @@ public class InsightReportDocument {
                 .clientName(clientName)
                 .testName(testName)
                 .model(aiModel)
+                .payloadMode(payloadMode)
                 .schemaName(schemaName)
                 .schemaVersion(schemaVersion)
                 .createdAt(createdAt)

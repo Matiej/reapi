@@ -27,7 +27,7 @@ public class ReportJobDocument {
     private ReportJobStatus status;
     private PayloadMode mode;
     private String error;
-    @Indexed(name = "expireAt_ttl_idx", expireAfter = "PT5M")
+    @Indexed(name = "expireAt_ttl_idx", expireAfter = "PT30M")
     private Instant expireAt;
     @CreatedDate
     private Instant createdAt;

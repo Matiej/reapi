@@ -28,7 +28,6 @@ import java.util.List;
 public class ProfileAnalysisReportController {
     private final ProfileAnalysisService profileAnalysisService;
 
-
     @Operation(
             summary = "Get all AI analysis by submissionID",
             description = "Retrieves all profiled clients analysis",

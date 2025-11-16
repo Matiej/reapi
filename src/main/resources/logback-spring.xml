@@ -33,7 +33,7 @@
         </root>
     </springProfile>
 
-    <!-- PROD: tylko plik (opcjonalnie dodaj CONSOLE jeśli chcesz) -->
+    <!-- PROD: tylko plik  -->
     <springProfile name="prod">
         <root level="INFO">
             <appender-ref ref="ROLLING"/>

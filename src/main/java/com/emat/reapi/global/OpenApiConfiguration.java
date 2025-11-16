@@ -13,8 +13,8 @@ public class OpenApiConfiguration {
     public OpenAPI apiInfo() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("EMAT REAPI – GIOS API")
-                        .description("API do synchronizacji i pobierania danych GIOS")
+                        .title("PROFILER BACKEND")
+                        .description("Finance profiler backend app")
                         .version("v1.0.0")
                         .contact(new Contact()
                                 .email("myEmail@email.com")

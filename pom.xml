@@ -11,8 +11,8 @@
     <groupId>com.emat</groupId>
     <artifactId>reapi</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>reapi</name>
-    <description>reactive programing playground</description>
+    <name>profiler-service</name>
+    <description>Profiler</description>
     <url/>
     <licenses>
         <license/>

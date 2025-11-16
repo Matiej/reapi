@@ -65,7 +65,6 @@ class GiosServiceImpl implements GiosService {
 
     }
 
-
     private Mono<Void> updateExistingStations(List<Station> stationList) {
         return Flux.fromIterable(stationList)
                 .flatMap(station -> {

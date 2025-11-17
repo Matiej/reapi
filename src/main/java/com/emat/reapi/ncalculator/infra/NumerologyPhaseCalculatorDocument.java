@@ -19,8 +19,8 @@ public class NumerologyPhaseCalculatorDocument {
     @Id
     private String id;
     private String requestedPhase;
-    private int vowelsResult;
-    private int consonantsResult;
+    private String vowelsResult;
+    private String consonantsResult;
     private String vibration;
     @CreatedDate
     private Instant createdAt;

@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class NumerologyPhraseCalculator {
-    private int vowelsResult;
-    private int consonantsResult;
+    private String vowelsResult;
+    private String consonantsResult;
     private String vibration;
 }

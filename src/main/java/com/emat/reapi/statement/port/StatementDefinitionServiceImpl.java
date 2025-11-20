@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-import static com.emat.reapi.statement.infra.StatementDefinitionsDictionary.ALL;
+import static com.emat.reapi.statement.infra.dictionary.StatementDefinitionsDictionary.ALL;
 
 @Service
 @Slf4j

@@ -68,7 +68,7 @@ public class NCalculatorServiceImpl implements NCalculatorService {
         );
         NumerologyPhaseCalculatorDocument document = new NumerologyPhaseCalculatorDocument(
                 null,
-                normalizedPhrase,
+                phrase,
                 vowelsVibration,
                 consonantsVibration,
                 vibration,

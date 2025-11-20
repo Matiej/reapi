@@ -1,4 +1,4 @@
-package com.emat.reapi.statement.infra;
+package com.emat.reapi.statement.infra.dictionary;
 
 import com.emat.reapi.statement.domain.StatementCategory;
 import com.emat.reapi.statement.domain.StatementDefinition;

@@ -6,13 +6,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 
-@Document("profiler_insight_report")
+@Document(value = InsightReportDocument.COLLECTION_NAME)
+@TypeAlias(value = InsightReportDocument.COLLECTION_NAME)
 @CompoundIndexes({
         @CompoundIndex(name = "submission_created_desc", def = "{'submissionId': 1, 'createdAt': -1}"),
         @CompoundIndex(name = "client_created_desc",    def = "{'clientId': 1, 'createdAt': -1}")
@@ -21,6 +23,9 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 public class InsightReportDocument {
+
+    public static final String COLLECTION_NAME = "profiler_insight_report";
+
     @Id
     private String id;
     private String clientName;

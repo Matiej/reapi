@@ -3,10 +3,14 @@ spring:
     name: @project.name@
   output:
     ansi.enabled: always
-
   data:
     mongodb:
-      auto-index-creation: true
+      auto-index-creation: false
+
+mongock:
+  transactional: false
+  migration-scan-package:
+    - com.emat.reapi.migrations
 
 logging:
   level:

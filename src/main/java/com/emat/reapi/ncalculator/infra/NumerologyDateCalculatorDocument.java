@@ -4,13 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(value = "numerology_date_calculators")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Document(value = NumerologyDateCalculatorDocument.COLLECTION_NAME)
+@TypeAlias(value = NumerologyDateCalculatorDocument.COLLECTION_NAME)
 public class NumerologyDateCalculatorDocument {
+
+    public static final String COLLECTION_NAME = "numerology_date_calculators";
+
     @Id
     private String id;
     private String requestedBrithDate;
@@ -23,3 +28,4 @@ public class NumerologyDateCalculatorDocument {
     private int worldDayVibration;
     private int personalDay;
 }
+

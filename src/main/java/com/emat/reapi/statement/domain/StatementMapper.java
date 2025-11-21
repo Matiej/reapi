@@ -4,7 +4,7 @@ import com.emat.reapi.api.dto.AnsweredStatementDto;
 import com.emat.reapi.api.dto.AnsweredStatementResponse;
 import com.emat.reapi.api.dto.StatementDto;
 import com.emat.reapi.api.dto.StatementResponse;
-import com.emat.reapi.statement.infra.StatementDefinitionsDictionary;
+import com.emat.reapi.statement.infra.dictionary.StatementDefinitionsDictionary;
 
 import java.util.List;
 

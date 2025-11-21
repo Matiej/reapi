@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -18,12 +19,16 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document("client_answer")
+@Document(ClientAnswerDocument.COLLECTION_NAME)
+@TypeAlias(ClientAnswerDocument.COLLECTION_NAME)
 @CompoundIndex(
         name = "client_category_idx",
         def = "{'clientId': 1, 'statementDocuments.statementCategory': 1}"
 )
 public class ClientAnswerDocument {
+
+    public final static String COLLECTION_NAME = "client_answer";
+
     @Id
     private String id;
     @Indexed(name = "public_id_idx")

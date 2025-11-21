@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -14,8 +15,12 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document("statement_definitions")
+@Document(value = StatementDefinitionDocument.COLLECTION_NAME)
+@TypeAlias(value = StatementDefinitionDocument.COLLECTION_NAME)
 public class StatementDefinitionDocument {
+
+    public static final String COLLECTION_NAME = "statement_definitions";
+
     @Id
     private String id;
     private String statementId;
@@ -31,7 +36,7 @@ public class StatementDefinitionDocument {
     }
 
     public StatementDefinition toDomain() {
-        return new StatementDefinition(statementId,  category, statementKey,statementTypeDefinitions);
+        return new StatementDefinition(statementId, category, statementKey, statementTypeDefinitions);
     }
 
     public static StatementDefinitionDocument toDocument(StatementDefinition domain) {

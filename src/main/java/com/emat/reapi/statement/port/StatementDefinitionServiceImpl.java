@@ -43,7 +43,6 @@ public class StatementDefinitionServiceImpl implements StatementDefinitionServic
 
         return Mono.just(ALL.stream().filter(p-> p.getCategory().equals(category)).toList());
 
-//        return statementDefinitionRepository.findAllByCategory(category.name())
-//                .map(StatementDefinitionDocument::toDomain);
+
     }
 }

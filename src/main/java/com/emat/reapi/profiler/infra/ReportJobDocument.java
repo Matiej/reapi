@@ -9,17 +9,22 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 
-@Document("reportJobs")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Document(ReportJobDocument.COLLECTION_NAME)
+@TypeAlias(ReportJobDocument.COLLECTION_NAME)
 public class ReportJobDocument {
+
+    public final static String COLLECTION_NAME = "reportJobs";
+
     @Id
     private String id;
     @Indexed(name = "submissionId_idx", unique = true)

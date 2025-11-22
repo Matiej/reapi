@@ -5,8 +5,10 @@ import com.emat.reapi.profiler.domain.report.PayloadMode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -37,8 +39,11 @@ public class InsightReportDocument {
     private String schemaName;
     private String schemaVersion;
     private String reportJson;
-    private Instant createdAt;
     private InsightReportStructuredAiDocument insightReportStructuredAiDocument;
+    @CreatedDate
+    private Instant createdAt;
+    @Version
+    private Long version;
 
     public static InsightReportDocument from(InsightReport report) {
         var doc = new InsightReportDocument();

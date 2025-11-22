@@ -2,7 +2,6 @@ package com.emat.reapi.migrations.v002statementdefinitioninit;
 
 import com.emat.reapi.statement.domain.StatementDefinition;
 import com.emat.reapi.statement.infra.StatementDefinitionDocument;
-import com.emat.reapi.statement.infra.dictionary.StatementDefinitionsDictionary;
 import io.mongock.api.annotations.ChangeUnit;
 import io.mongock.api.annotations.Execution;
 import io.mongock.api.annotations.RollbackExecution;
@@ -47,7 +46,7 @@ public class AddStatementDefinitionsChangeUnit {
 
     @RollbackExecution
     public void rollback() {
-        List<String> statementIds = StatementDefinitionsDictionary.ALL.stream()
+        List<String> statementIds = StatementDefinitionsSeed.ALL.stream()
                 .map(StatementDefinition::getStatementId)
                 .map(String::trim)
                 .map(String::toLowerCase)

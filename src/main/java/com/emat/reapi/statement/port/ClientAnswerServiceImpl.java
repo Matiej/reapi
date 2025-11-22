@@ -2,9 +2,7 @@ package com.emat.reapi.statement.port;
 
 import com.emat.reapi.api.dto.ClientAnswerDto;
 import com.emat.reapi.statement.domain.ClientAnswer;
-import com.emat.reapi.statement.infra.ClientAnswerDocument;
-import com.emat.reapi.statement.infra.ClientAnswerRepository;
-import com.emat.reapi.statement.infra.ClientAnswerShortProjection;
+import com.emat.reapi.statement.infra.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -21,16 +19,23 @@ import java.util.List;
 @AllArgsConstructor
 class ClientAnswerServiceImpl implements ClientAnswerService {
     private final ClientAnswerRepository clientAnswerRepository;
+    private final StatementDefinitionRepository statementDefinitionRepository;
 
     @Override
     public Mono<Void> saveClientAnswers(ClientAnswerDto clientAnswer) {
         log.info("Saving client answers for clientId: {}", clientAnswer.clientId());
-        ClientAnswer clientAnswerDomain = clientAnswer.toDomain();
-        ClientAnswerDocument document = ClientAnswerDocument.toDocument(clientAnswerDomain);
-        return clientAnswerRepository.save(document)
-                .doOnSuccess(saved -> log.debug("Saved clients answers: {}", clientAnswer))
-                .doOnError(error -> log.error("Error saving client answers for clientId: {}", clientAnswer.clientId(), error))
-                .then();
+        return statementDefinitionRepository.findAll()
+                .map(StatementDefinitionDocument::toDomain)
+                .collectList()
+                .flatMap(list -> {
+                            ClientAnswer clientAnswerDomain = clientAnswer.toDomain(list);
+                            ClientAnswerDocument document = ClientAnswerDocument.toDocument(clientAnswerDomain);
+                            return clientAnswerRepository.save(document)
+                                    .doOnSuccess(saved -> log.debug("Saved clients answers: {}", clientAnswer))
+                                    .doOnError(error -> log.error("Error saving client answers for clientId: {}", clientAnswer.clientId(), error));
+
+                        }
+                ).then();
     }
 
     @Override
@@ -40,7 +45,7 @@ class ClientAnswerServiceImpl implements ClientAnswerService {
                 .map(ClientAnswerDocument::toDomain)
                 .collectList()
                 .doOnError(error -> log.error("Error retrieving client test answers"))
-                .doOnSuccess(it -> log.info("Retrieved {} client tests", it.size())
+                .doOnSuccess(it -> log.info("Retrieved {} client answered tests", it.size())
                 );
     }
 

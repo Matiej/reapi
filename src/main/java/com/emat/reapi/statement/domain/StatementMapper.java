@@ -4,7 +4,6 @@ import com.emat.reapi.api.dto.AnsweredStatementDto;
 import com.emat.reapi.api.dto.AnsweredStatementResponse;
 import com.emat.reapi.api.dto.StatementDto;
 import com.emat.reapi.api.dto.StatementResponse;
-import com.emat.reapi.statement.infra.dictionary.StatementDefinitionsDictionary;
 
 import java.util.List;
 
@@ -12,15 +11,19 @@ public final class StatementMapper {
     private StatementMapper() {
     }
 
-    public static ClientStatement toDomain(AnsweredStatementDto dto) {
+    public static ClientStatement toDomain(AnsweredStatementDto dto, List<StatementDefinition> statementDefinitionDocuments) {
         if (dto == null) return null;
-        var def = StatementDefinitionsDictionary.requireById(dto.getStatementId());
-        return new ClientStatement(
-                def.getStatementId(),
-                def.getStatementKey(),
-                toStatements(def.getStatementTypeDefinitions(), dto.getStatementDtoList()),
-                def.getCategory()
-        );
+        return statementDefinitionDocuments
+                .stream()
+                .filter(p -> p.getStatementId().equalsIgnoreCase(dto.getStatementId()))
+                .findFirst()
+                .map(definition ->
+                        new ClientStatement(
+                                definition.getStatementId(),
+                                definition.getStatementKey(),
+                                toStatements(definition.getStatementTypeDefinitions(), dto.getStatementDtoList()),
+                                definition.getCategory())
+                ).orElseThrow(() -> new IllegalArgumentException("Can't find definition for statementId: " + dto.getStatementId()));
     }
 
     public static AnsweredStatementResponse toAnsweredStatementResponse(ClientStatement clientStatement) {
@@ -56,5 +59,4 @@ public final class StatementMapper {
 
                 )).toList();
     }
-
 }

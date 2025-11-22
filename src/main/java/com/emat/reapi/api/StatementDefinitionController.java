@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/definition")
 @Slf4j
@@ -65,16 +63,13 @@ public class StatementDefinitionController {
             responses = @ApiResponse(responseCode = "200", description = "List retrieved successfully")
     )
     @GetMapping(value = "/category", params = "category")
-    public Mono<List<StatementDefinitionDto>> getStatementsByCategory(
+    public Flux<StatementDefinitionDto> getStatementsByCategory(
             @Parameter(description = "Category to filter definitions")
             @RequestParam StatementCategory category
     ) {
         log.info("received request: GET /api/statement/statements with 'category': {}", category);
         return statementService.getStatementDefinitionsByCategory(category)
-                .map(it -> it
-                        .stream()
-                        .map(StatementDefinitionDto::toDto)
-                        .toList());
+                .map(StatementDefinitionDto::toDto);
     }
 
 }

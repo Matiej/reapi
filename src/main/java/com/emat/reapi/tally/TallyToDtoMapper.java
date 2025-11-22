@@ -5,7 +5,6 @@ import com.emat.reapi.api.dto.ClientAnswerDto;
 import com.emat.reapi.api.dto.StatementDto;
 import com.emat.reapi.api.tally.TallyWebhookEvent;
 import com.emat.reapi.statement.domain.StatementDefinition;
-import com.emat.reapi.statement.infra.dictionary.StatementDefinitionsDictionary;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
@@ -17,7 +16,7 @@ public final class TallyToDtoMapper {
     private TallyToDtoMapper() {
     }
 
-    public static ClientAnswerDto map(TallyWebhookEvent event) {
+    public static ClientAnswerDto map(TallyWebhookEvent event, List<StatementDefinition> statementDefinitions) {
         var data = event.getData();
         String clientId = data.getRespondentId();
         String submissionId = data.getSubmissionId();
@@ -32,10 +31,13 @@ public final class TallyToDtoMapper {
 
             String key = field.getKey();
 
-            final StatementDefinition def;
-            try {
-                def = StatementDefinitionsDictionary.requireByKey(key);
-            } catch (Exception ex) {
+            final StatementDefinition def = statementDefinitions
+                    .stream()
+                    .filter(p -> key.equalsIgnoreCase(p.getStatementKey()))
+                    .findAny()
+                    .orElse(null);
+
+            if (def == null) {
                 log.warn("No definition for key={}", key);
                 continue;
             }

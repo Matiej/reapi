@@ -23,7 +23,15 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://profiler_app:${MONGO_PWD}@mongo:27017/profiler?authSource=profiler
+      host: mongo
+      port: 27017
+      database: profiler
+      username: profiler_app
+      password: ${MONGO_PWD}
+      authentication-database: profiler
+#  data:
+#    mongodb:
+#      uri: mongodb://profiler_app:${MONGO_PWD}@mongo:27017/profiler?authSource=profiler
 
 logging:
   level:

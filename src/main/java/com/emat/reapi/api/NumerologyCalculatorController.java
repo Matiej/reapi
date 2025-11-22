@@ -15,8 +15,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import static com.emat.reapi.api.dto.ncalculator.PhraseCalculatorResponse.fromDomain;
-
 @RestController
 @RequestMapping("/api/ncalculator")
 @Slf4j

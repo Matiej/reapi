@@ -76,6 +76,13 @@ class ClientAnswerServiceImpl implements ClientAnswerService {
         log.info("Trying to retrieve client test by client Id: {}", clientId);
         return clientAnswerRepository.findClientAnswerDocumentByClientId(clientId)
                 .map(ClientAnswerDocument::toDomain)
+                .switchIfEmpty(Mono.defer(() -> {
+                    log.warn("No client answers for clientId={}", clientId);
+                    return Mono.error(new ResponseStatusException(
+                            HttpStatus.NOT_FOUND,
+                            "No client statement test found for clientId=" + clientId
+                    ));
+                }))
                 .doOnError(error -> log.error("Error retrieving client test answers for client id: {}", clientId))
                 .doOnSuccess(it -> log.info("Retrieved client test for client Id: {}", it.getClientId())
                 );

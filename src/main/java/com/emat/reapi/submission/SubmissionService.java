@@ -7,6 +7,8 @@ import reactor.core.publisher.Mono;
 public interface SubmissionService {
     Mono<Submission> findBySubmissionId(String submissionId);
     Mono<Submission> createSubmission(SubmissionDto request);
+    Mono<Submission> updateSubmission(SubmissionDto request, String submissionId);
     Flux<Submission> findAllByOrderByCreatedAtDesc();
-    Mono<Void> closeSubmission();
+    Mono<Void> deleteSubmission(String submissionId);
+    Mono<Submission> closeSubmission(String submissionId);
 }

@@ -9,7 +9,8 @@ public record Submission(
         String clientName,
         String testName,
         SubmissionStatus status,
-        int duration,
+        int durationMinutes,
+        String publicToken,
         Instant expireAt,
         Instant createdAt
 ) {

@@ -5,6 +5,6 @@ public record SubmissionDto(
         String clientId,
         String clientName,
         String testName,
-        int duration
+        int durationMin
 ) {
 }

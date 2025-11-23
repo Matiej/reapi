@@ -26,7 +26,8 @@ public class SubmissionDocument {
     private String clientName;
     private String testName;
     private SubmissionStatus status;
-    private int duration;
+    private int durationMinutes;
+    private String publicToken;
     private Instant expireAt;
     @CreatedDate
     private Instant createdAt;
@@ -43,7 +44,8 @@ public class SubmissionDocument {
                 this.clientName,
                 this.testName,
                 this.status,
-                this.duration,
+                this.durationMinutes,
+                this.publicToken,
                 this.expireAt,
                 this.createdAt
         );
@@ -57,6 +59,9 @@ public class SubmissionDocument {
         doc.setClientName(domain.clientName());
         doc.setTestName(domain.testName());
         doc.setStatus(domain.status());
+        doc.setDurationMinutes(domain.durationMinutes());
+        doc.setExpireAt(domain.expireAt());
+        doc.setPublicToken(domain.publicToken());
         doc.setCreatedAt(domain.createdAt());
         return doc;
     }

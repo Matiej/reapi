@@ -13,6 +13,7 @@ public record SubmissionResponse(
         String testName,
         SubmissionStatus status,
         long remainingSeconds,
+        String publicToken,
         Instant createdAt
 ) {
     public static SubmissionResponse fromDomain(Submission domain) {
@@ -25,6 +26,7 @@ public record SubmissionResponse(
                 domain.testName(),
                 domain.status(),
                 remaining,
+                domain.publicToken(),
                 domain.createdAt()
         );
     }

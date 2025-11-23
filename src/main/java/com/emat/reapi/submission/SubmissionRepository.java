@@ -8,6 +8,6 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface SubmissionRepository extends ReactiveMongoRepository<SubmissionDocument, String> {
     Mono<SubmissionDocument> findBySubmissionId(String submissionId);
-
+    Mono<Void> deleteBySubmissionId(String submissionId);
     Flux<SubmissionDocument> findAllByOrderByCreatedAtDesc();
 }

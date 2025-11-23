@@ -37,6 +37,19 @@ public class SubmissionController {
     }
 
     @Operation(
+            summary = "Get all submissions",
+            description = "Retrieves all submissions for clients ordered by createdAt date",
+            responses = @ApiResponse(responseCode = "200", description = "List retrieved successfully")
+    )
+    @GetMapping("/{submissionId}")
+    @ResponseStatus(HttpStatus.OK)
+    Mono<SubmissionResponse> findBySubmissionId(@PathVariable String submissionId) {
+        log.info("Received request: GET '/api/submission/{submissionsId}' to retrieve for submissionId: {}", submissionId);
+        return submissionService.findBySubmissionId(submissionId)
+                .map(SubmissionResponse::fromDomain);
+    }
+
+    @Operation(
             summary = "Create new submission",
             description = "Creates a new submission session for a given client and test",
             responses = {
@@ -49,6 +62,50 @@ public class SubmissionController {
     Mono<SubmissionResponse> createSubmission(@RequestBody @Validated SubmissionDto request) {
         log.info("Received request: POST '/api/submission' to create submission for clientId={}", request.clientId());
         return submissionService.createSubmission(request)
+                .map(SubmissionResponse::fromDomain);
+    }
+
+    @Operation(
+            summary = "Update submission",
+            description = "Update submission session for a given submissionId",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Submission updated successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid request payload")
+            }
+    )
+    @PutMapping("/{submissionId}")
+    @ResponseStatus(HttpStatus.OK)
+    Mono<SubmissionResponse> updateSubmission(
+            @RequestBody @Validated SubmissionDto update,
+            @PathVariable String submissionId
+    ) {
+        log.info("Received request: PUT '/api/submission/{submissionId}' update for submissionId: {}", submissionId);
+        return submissionService.updateSubmission(update, submissionId)
+                .map(SubmissionResponse::fromDomain);
+    }
+
+    @Operation(
+            summary = "Delete submission",
+            description = "Delete submission session for a given submissionId",
+            responses = {
+                    @ApiResponse(responseCode = "202", description = "Accepted"),
+                    @ApiResponse(responseCode = "400", description = "Invalid request payload")
+            }
+    )
+    @DeleteMapping("/{submissionId}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    Mono<Void> deleteSubmission(
+            @PathVariable String submissionId
+    ) {
+        log.info("Received request: DELETE '/api/submission/{submissionId}' delete for submissionId: {}", submissionId);
+        return submissionService.deleteSubmission(submissionId);
+    }
+
+    @PutMapping("/{submissionId}/close")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    Mono<SubmissionResponse> closeSubmissions(@PathVariable String submissionId) {
+        log.info("Received request: PUT '/api/submission/{submissionId}/close' close  submissionId: {}", submissionId);
+        return submissionService.closeSubmission(submissionId)
                 .map(SubmissionResponse::fromDomain);
     }
 }

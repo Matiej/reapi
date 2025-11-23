@@ -19,7 +19,13 @@ public class SubmissionServiceImpl implements SubmissionService {
 
     @Override
     public Mono<Submission> findBySubmissionId(String submissionId) {
-        return null;
+        return submissionRepository.findBySubmissionId(submissionId)
+                .switchIfEmpty(Mono.error(new SubmissionException(
+                                "Submission not found: " + submissionId,
+                                SubmissionException.SubmissionErrorType.SUBMISSION_NOT_FOUND)
+                        )
+                )
+                .map(SubmissionDocument::toDomain);
     }
 
     @Override
@@ -31,16 +37,46 @@ public class SubmissionServiceImpl implements SubmissionService {
         document.setClientName(request.clientName());
         document.setTestName(request.testName());
         document.setStatus(SubmissionStatus.OPEN);
-        document.setDuration(request.duration());
-        document.setExpireAt(Instant.now().plusSeconds(request.duration()));
+        document.setDurationMinutes(request.durationMin());
+        document.setExpireAt(Instant.now().plusSeconds(request.durationMin() * 60L));
+        document.setPublicToken("pt_"+ UUID.randomUUID());
 
         return submissionRepository.save(document)
                 .map(SubmissionDocument::toDomain)
                 .doOnSuccess(sa -> log.info("Submission ID: '{}' created successful", sa.submissionId()))
                 .onErrorMap(e -> {
                     log.error("Error creating submission for clientId: {}", request.clientId(), e);
-                    return new SubmissionCreateException("Failed to create submission", e);
+                    return new SubmissionException(
+                            "Failed to create submission",
+                            e,
+                            SubmissionException.SubmissionErrorType.SUBMISSION_CREATE_ERROR
+                    );
                 });
+    }
+
+    @Override
+    public Mono<Submission> updateSubmission(SubmissionDto request, String submissionId) {
+        return submissionRepository.findBySubmissionId(submissionId)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Can't find submissionId: " + submissionId)))
+                .map(document -> {
+                            document.setClientName(request.clientName());
+                            document.setTestName(request.testName());
+                            document.setDurationMinutes(request.durationMin());
+                            document.setExpireAt(Instant.now().plusSeconds(request.durationMin() * 60L));
+                            return document;
+                        }
+                )
+                .flatMap(submissionRepository::save)
+                .map(SubmissionDocument::toDomain)
+                .doOnSuccess(suc -> log.info("Submission ID: {} updated successful", submissionId))
+                .onErrorMap(e -> {
+                    log.error("Error updating submission ID: {}", submissionId, e);
+                    return new SubmissionException(
+                            "Failed to create submission",
+                            e,
+                            SubmissionException.SubmissionErrorType.SUBMISSION_UPDATE_ERROR);
+                });
+
     }
 
     @Override
@@ -50,7 +86,30 @@ public class SubmissionServiceImpl implements SubmissionService {
     }
 
     @Override
-    public Mono<Void> closeSubmission() {
-        return null;
+    public Mono<Void> deleteSubmission(String submissionId) {
+        return submissionRepository.deleteBySubmissionId(submissionId)
+                .doOnError(e -> {
+                    log.error("Can't delete submissionID: {}", submissionId, e);
+                });
+    }
+
+    @Override
+    public Mono<Submission> closeSubmission(String submissionId) {
+        return submissionRepository.findBySubmissionId(submissionId)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Can't find submissionId: " + submissionId)))
+                .flatMap(document -> {
+                            document.setStatus(SubmissionStatus.DONE);
+                            return submissionRepository.save(document);
+                        }
+                )
+                .map(SubmissionDocument::toDomain)
+                .doOnSuccess(suc -> log.info("Submission ID: {} updated successful", submissionId))
+                .onErrorMap(e -> {
+                    log.error("Error updating submission ID: {}", submissionId, e);
+                    return new SubmissionException(
+                            "Failed to create submission",
+                            e,
+                            SubmissionException.SubmissionErrorType.SUBMISSION_UPDATE_ERROR);
+                });
     }
 }

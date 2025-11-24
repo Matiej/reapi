@@ -6,6 +6,7 @@ import com.emat.reapi.submission.SubmissionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -59,7 +60,7 @@ public class SubmissionController {
     )
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    Mono<SubmissionResponse> createSubmission(@RequestBody @Validated SubmissionDto request) {
+    Mono<SubmissionResponse> createSubmission(@RequestBody @Valid SubmissionDto request) {
         log.info("Received request: POST '/api/submission' to create submission for clientId={}", request.clientId());
         return submissionService.createSubmission(request)
                 .map(SubmissionResponse::fromDomain);
@@ -76,7 +77,7 @@ public class SubmissionController {
     @PutMapping("/{submissionId}")
     @ResponseStatus(HttpStatus.OK)
     Mono<SubmissionResponse> updateSubmission(
-            @RequestBody @Validated SubmissionDto update,
+            @RequestBody @Valid SubmissionDto update,
             @PathVariable String submissionId
     ) {
         log.info("Received request: PUT '/api/submission/{submissionId}' update for submissionId: {}", submissionId);

@@ -22,11 +22,15 @@ public class SubmissionDocument {
     private String id;
     @Indexed(name = "submissionId_idx", background = true)
     private String submissionId;
+    @Indexed(name = "orderId_idx", unique = true, background = true)
+    private String orderId;
     private String clientId;
     private String clientName;
     private String testName;
+    private String clientEmail;
     private SubmissionStatus status;
-    private int durationMinutes;
+    private int durationDays;
+    @Indexed(name = "publicToken_idx", unique = true, background = true)
     private String publicToken;
     private Instant expireAt;
     @CreatedDate
@@ -42,9 +46,11 @@ public class SubmissionDocument {
                 this.submissionId,
                 this.clientId,
                 this.clientName,
+                this.clientEmail,
+                this.orderId,
                 this.testName,
                 this.status,
-                this.durationMinutes,
+                this.durationDays,
                 this.publicToken,
                 this.expireAt,
                 this.createdAt
@@ -57,9 +63,11 @@ public class SubmissionDocument {
         doc.setSubmissionId(domain.submissionId());
         doc.setClientId(domain.clientId());
         doc.setClientName(domain.clientName());
+        doc.setClientEmail(domain.clientEmail());
+        doc.setOrderId(domain.orderId());
         doc.setTestName(domain.testName());
         doc.setStatus(domain.status());
-        doc.setDurationMinutes(domain.durationMinutes());
+        doc.setDurationDays(domain.durationDays());
         doc.setExpireAt(domain.expireAt());
         doc.setPublicToken(domain.publicToken());
         doc.setCreatedAt(domain.createdAt());

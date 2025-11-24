@@ -30,16 +30,19 @@ public class SubmissionServiceImpl implements SubmissionService {
 
     @Override
     public Mono<Submission> createSubmission(SubmissionDto request) {
+        long seconds = request.durationDays() * 24L * 60L * 60L;
         log.info("Creating submission for clientId: {}", request.clientId());
         var document = new SubmissionDocument();
         document.setSubmissionId("sub_" + UUID.randomUUID());
         document.setClientId(request.clientId());
         document.setClientName(request.clientName());
+        document.setClientEmail(request.clientEmail());
+        document.setOrderId(request.orderId() + "_" + UUID.randomUUID());
         document.setTestName(request.testName());
         document.setStatus(SubmissionStatus.OPEN);
-        document.setDurationMinutes(request.durationMin());
-        document.setExpireAt(Instant.now().plusSeconds(request.durationMin() * 60L));
-        document.setPublicToken("pt_"+ UUID.randomUUID());
+        document.setDurationDays(request.durationDays());
+        document.setPublicToken("pt_" + UUID.randomUUID());
+        document.setExpireAt(Instant.now().plusSeconds(seconds));
 
         return submissionRepository.save(document)
                 .map(SubmissionDocument::toDomain)
@@ -61,8 +64,8 @@ public class SubmissionServiceImpl implements SubmissionService {
                 .map(document -> {
                             document.setClientName(request.clientName());
                             document.setTestName(request.testName());
-                            document.setDurationMinutes(request.durationMin());
-                            document.setExpireAt(Instant.now().plusSeconds(request.durationMin() * 60L));
+                            document.setDurationDays(request.durationDays());
+                            document.setExpireAt(Instant.now().plusSeconds(request.durationDays() * 60L));
                             return document;
                         }
                 )

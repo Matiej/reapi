@@ -7,9 +7,11 @@ public record Submission(
         String submissionId,
         String clientId,
         String clientName,
+        String clientEmail,
+        String orderId,
         String testName,
         SubmissionStatus status,
-        int durationMinutes,
+        int durationDays,
         String publicToken,
         Instant expireAt,
         Instant createdAt

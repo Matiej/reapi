@@ -1,10 +1,32 @@
 package com.emat.reapi.api.dto;
 
-//todo create validations for each filed
+import jakarta.validation.constraints.*;
+
 public record SubmissionDto(
+        @NotBlank(message = "clientId is required")
+        @Size(max = 100, message = "clientId must be at most 100 characters long")
         String clientId,
+
+        @NotBlank(message = "clientName is required")
+        @Size(max = 200, message = "clientName must be at most 200 characters long")
         String clientName,
+
+        @NotBlank(message = "clientEmail is required")
+        @Email(message = "clientEmail must be a valid email address")
+        @Size(max = 320, message = "clientEmail must be at most 320 characters long")
+        String clientEmail,
+
+        @NotBlank(message = "orderId is required")
+        @Size(max = 100, message = "orderId must be at most 100 characters long")
+        String orderId,
+
+        //todo create validation when tests will be created in db, then will validate test name with existing or maybe change to testId?
+        @NotBlank(message = "testName is required")
+        @Size(max = 200, message = "testName must be at most 200 characters long")
         String testName,
-        int durationMin
+
+        @Min(value = 1, message = "durationDays must be at least 1 days")
+        @Max(value = 99, message = "durationDays cannot exceed 99 days")
+        int durationDays
 ) {
 }

@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class StatementDefinitionDocument {
     @Id
     private String id;
     private String statementId;
+    @Indexed(name = "statementKey_idx", background = true, unique = true)
     private String statementKey;
     private StatementCategory category;
     private List<StatementTypeDefinition> statementTypeDefinitions;

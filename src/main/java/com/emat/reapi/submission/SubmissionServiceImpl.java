@@ -13,7 +13,7 @@ import java.util.UUID;
 @Service
 @AllArgsConstructor
 @Slf4j
-public class SubmissionServiceImpl implements SubmissionService {
+class SubmissionServiceImpl implements SubmissionService {
 
     private final SubmissionRepository submissionRepository;
 

@@ -1,6 +1,7 @@
 package com.emat.reapi.submission;
 
 import com.emat.reapi.api.dto.SubmissionDto;
+import com.emat.reapi.api.dto.SubmissionUpdateDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,6 @@ class SubmissionServiceImpl implements SubmissionService {
 
     @Override
     public Mono<Submission> createSubmission(SubmissionDto request) {
-        long seconds = request.durationDays() * 24L * 60L * 60L;
         log.info("Creating submission for clientId: {}", request.clientId());
         var document = new SubmissionDocument();
         document.setSubmissionId("sub_" + UUID.randomUUID());
@@ -42,7 +42,7 @@ class SubmissionServiceImpl implements SubmissionService {
         document.setStatus(SubmissionStatus.OPEN);
         document.setDurationDays(request.durationDays());
         document.setPublicToken("pt_" + UUID.randomUUID());
-        document.setExpireAt(Instant.now().plusSeconds(seconds));
+        document.setExpireAt(Instant.now().plusSeconds(convertDaysToSeconds(request.durationDays())));
 
         return submissionRepository.save(document)
                 .map(SubmissionDocument::toDomain)
@@ -58,14 +58,14 @@ class SubmissionServiceImpl implements SubmissionService {
     }
 
     @Override
-    public Mono<Submission> updateSubmission(SubmissionDto request, String submissionId) {
+    public Mono<Submission> updateSubmission(SubmissionUpdateDto request, String submissionId) {
         return submissionRepository.findBySubmissionId(submissionId)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("Can't find submissionId: " + submissionId)))
                 .map(document -> {
                             document.setClientName(request.clientName());
                             document.setTestId(request.testId());
                             document.setDurationDays(request.durationDays());
-                            document.setExpireAt(Instant.now().plusSeconds(request.durationDays() * 60L));
+                            document.setExpireAt(Instant.now().plusSeconds(convertDaysToSeconds(request.durationDays())));
                             return document;
                         }
                 )
@@ -80,6 +80,10 @@ class SubmissionServiceImpl implements SubmissionService {
                             SubmissionException.SubmissionErrorType.SUBMISSION_UPDATE_ERROR);
                 });
 
+    }
+
+    private long convertDaysToSeconds(int days) {
+        return days * 24L * 60L * 60L;
     }
 
     @Override

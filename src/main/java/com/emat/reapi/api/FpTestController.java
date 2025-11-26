@@ -110,7 +110,7 @@ public class FpTestController {
     )
     @ResponseStatus(HttpStatus.OK)
     public Flux<FpTestStatementDto> getAllTestStatements() {
-        log.info("Received request: GET '/api/pftest/statements}' to get all shroten test statements");
+        log.info("Received request: GET '/api/pftest/statements' to get all shorten test statements");
         return fpTestService.getAllTestStatements()
                 .map(FpTestStatementDto::fromDomain);
     }

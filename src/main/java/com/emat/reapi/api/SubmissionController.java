@@ -2,6 +2,7 @@ package com.emat.reapi.api;
 
 import com.emat.reapi.api.dto.SubmissionDto;
 import com.emat.reapi.api.dto.SubmissionResponse;
+import com.emat.reapi.api.dto.SubmissionUpdateDto;
 import com.emat.reapi.submission.SubmissionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -77,7 +78,7 @@ public class SubmissionController {
     @PutMapping("/{submissionId}")
     @ResponseStatus(HttpStatus.OK)
     Mono<SubmissionResponse> updateSubmission(
-            @RequestBody @Valid SubmissionDto update,
+            @RequestBody @Valid SubmissionUpdateDto update,
             @PathVariable String submissionId
     ) {
         log.info("Received request: PUT '/api/submission/{submissionId}' update for submissionId: {}", submissionId);

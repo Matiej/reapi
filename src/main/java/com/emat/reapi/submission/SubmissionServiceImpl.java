@@ -38,7 +38,7 @@ class SubmissionServiceImpl implements SubmissionService {
         document.setClientName(request.clientName());
         document.setClientEmail(request.clientEmail());
         document.setOrderId(request.orderId() + "_" + UUID.randomUUID());
-        document.setTestName(request.testName());
+        document.setTestId(request.testId());
         document.setStatus(SubmissionStatus.OPEN);
         document.setDurationDays(request.durationDays());
         document.setPublicToken("pt_" + UUID.randomUUID());
@@ -63,7 +63,7 @@ class SubmissionServiceImpl implements SubmissionService {
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("Can't find submissionId: " + submissionId)))
                 .map(document -> {
                             document.setClientName(request.clientName());
-                            document.setTestName(request.testName());
+                            document.setTestId(request.testId());
                             document.setDurationDays(request.durationDays());
                             document.setExpireAt(Instant.now().plusSeconds(request.durationDays() * 60L));
                             return document;

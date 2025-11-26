@@ -21,9 +21,9 @@ public record SubmissionDto(
         String orderId,
 
         //todo create validation when tests will be created in db, then will validate test name with existing or maybe change to testId?
-        @NotBlank(message = "testName is required")
-        @Size(max = 200, message = "testName must be at most 200 characters long")
-        String testName,
+        @NotBlank(message = "testId is required")
+        @Size(max = 200, message = "testId must be at most 200 characters long")
+        String testId,
 
         @Min(value = 1, message = "durationDays must be at least 1 days")
         @Max(value = 99, message = "durationDays cannot exceed 99 days")

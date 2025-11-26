@@ -12,7 +12,7 @@ public interface ClientAnswerRepository extends ReactiveMongoRepository<ClientAn
     Mono<ClientAnswerDocument> findClientAnswerDocumentByClientId(String clientId);
     Mono<ClientAnswerDocument> findClientAnswerDocumentBySubmissionId(String submissionId);
 
-    @Query(value = "{}", fields = "{ clientName:1, clientId:1, submissionId:1, submissionDate:1, testName:1 }")
+    @Query(value = "{}", fields = "{ clientName:1, clientId:1, submissionId:1, submissionDate:1, testId:1 }")
     Flux<ClientAnswerShortProjection> findAllProjectedBy(Sort sort);
 
 }

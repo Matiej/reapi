@@ -9,7 +9,7 @@ public record Submission(
         String clientName,
         String clientEmail,
         String orderId,
-        String testName,
+        String testId,
         SubmissionStatus status,
         int durationDays,
         String publicToken,

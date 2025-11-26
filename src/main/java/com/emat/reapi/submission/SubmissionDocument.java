@@ -26,7 +26,7 @@ public class SubmissionDocument {
     private String orderId;
     private String clientId;
     private String clientName;
-    private String testName;
+    private String testId;
     private String clientEmail;
     private SubmissionStatus status;
     private int durationDays;
@@ -48,7 +48,7 @@ public class SubmissionDocument {
                 this.clientName,
                 this.clientEmail,
                 this.orderId,
-                this.testName,
+                this.testId,
                 this.status,
                 this.durationDays,
                 this.publicToken,
@@ -65,7 +65,7 @@ public class SubmissionDocument {
         doc.setClientName(domain.clientName());
         doc.setClientEmail(domain.clientEmail());
         doc.setOrderId(domain.orderId());
-        doc.setTestName(domain.testName());
+        doc.setTestId(domain.testId());
         doc.setStatus(domain.status());
         doc.setDurationDays(domain.durationDays());
         doc.setExpireAt(domain.expireAt());

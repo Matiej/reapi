@@ -2,6 +2,7 @@ package com.emat.reapi.api;
 
 import com.emat.reapi.api.dto.fptestdto.FpTestDto;
 import com.emat.reapi.api.dto.fptestdto.FpTestResponse;
+import com.emat.reapi.api.dto.fptestdto.FpTestStatementDto;
 import com.emat.reapi.fptest.FpTestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -96,5 +97,21 @@ public class FpTestController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Mono<Void> deleteTest(@PathVariable String testId) {
         return fpTestService.deleteFpTestByTestId(testId);
+    }
+
+    @GetMapping("/statements")
+    @Operation(
+            summary = "Get all test statements",
+            description = "Get all test shorten statements for creation and test managing",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Fetched successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid request payload")
+            }
+    )
+    @ResponseStatus(HttpStatus.OK)
+    public Flux<FpTestStatementDto> getAllTestStatements() {
+        log.info("Received request: GET '/api/pftest/statements}' to get all shroten test statements");
+        return fpTestService.getAllTestStatements()
+                .map(FpTestStatementDto::fromDomain);
     }
 }

@@ -101,6 +101,12 @@ class FpTestServiceImpl implements FpTestService {
                 .flatMap(doc -> fpTestRepository.deleteByTestId(testId));
     }
 
+    @Override
+    public Flux<FpTestStatement> getAllTestStatements() {
+        return statementDefinitionService.getAllStatementDefinitions()
+                .map(FpTestStatement::formStatementDefinition);
+    }
+
     private Mono<List<FpTestStatement>> buildFpTestStatements(List<String> statementKeys) {
         return statementDefinitionService.getAllStatementDefinitions()
                 .collectMap(StatementDefinition::getStatementKey)

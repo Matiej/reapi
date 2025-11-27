@@ -10,11 +10,12 @@ public record FpTestResponse(
         String descriptionBefore,
         String descriptionAfter,
         List<FpTestStatementDto> fpTestStatementDtoList,
+        List<String> submissionIds,
         String createdAt,
         String updatedAt
 ) {
 
-    public static FpTestResponse toResponse(FpTest domain) {
+    public static FpTestResponse toResponse(FpTest domain, List<String> submissions) {
         String createdAt = domain.createdAt() != null ? domain.createdAt().toString() : null;
         String updatedAt = domain.updatedAt() != null ? domain.updatedAt().toString() : null;
 
@@ -27,6 +28,7 @@ public record FpTestResponse(
                         .stream()
                         .map(FpTestStatementDto::fromDomain)
                         .toList(),
+                submissions,
                 createdAt,
                 updatedAt
         );

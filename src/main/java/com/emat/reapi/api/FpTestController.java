@@ -34,8 +34,7 @@ public class FpTestController {
     @ResponseStatus(HttpStatus.OK)
     public Flux<FpTestResponse> getAllTests() {
         log.info("Received request: GET '/api/pftest' to retrieve all tests");
-        return fpTestService.findAll()
-                .map(FpTestResponse::toResponse);
+        return fpTestService.findAll();
     }
 
     @GetMapping("/{testId}")
@@ -46,8 +45,7 @@ public class FpTestController {
     )
     public Mono<FpTestResponse> getTestByTestId(@PathVariable String testId) {
         log.info("Received request: GET '/api/pftest/{testId}' to retrieve test for given testId");
-        return fpTestService.findFpTestByTestId(testId)
-                .map(FpTestResponse::toResponse);
+        return fpTestService.findFpTestByTestId(testId);
     }
 
     @Operation(
@@ -62,8 +60,7 @@ public class FpTestController {
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<FpTestResponse> createTest(@Valid @RequestBody FpTestDto request) {
         log.info("Received request: POST '/api/pftest/' creating test");
-        return fpTestService.createFpTest(request)
-                .map(FpTestResponse::toResponse);
+        return fpTestService.createFpTest(request);
     }
 
     @PutMapping("/{testId}")
@@ -81,8 +78,7 @@ public class FpTestController {
             @Valid @RequestBody FpTestDto request
     ) {
         log.info("Received request: PUT '/api/pftest/{testId}' updating test");
-        return fpTestService.updateFpTest(request.addTestId(testId))
-                .map(FpTestResponse::toResponse);
+        return fpTestService.updateFpTest(request.addTestId(testId));
     }
 
     @DeleteMapping("/{testId}")

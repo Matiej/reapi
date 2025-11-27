@@ -10,4 +10,6 @@ public interface SubmissionRepository extends ReactiveMongoRepository<Submission
     Mono<SubmissionDocument> findBySubmissionId(String submissionId);
     Mono<Void> deleteBySubmissionId(String submissionId);
     Flux<SubmissionDocument> findAllByOrderByCreatedAtDesc();
+    Mono<Boolean> existsByTestId(String testId);
+    Flux<SubmissionDocument> findAllByTestId(String testId);
 }

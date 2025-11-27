@@ -26,6 +26,7 @@ public class SubmissionDocument {
     private String orderId;
     private String clientId;
     private String clientName;
+    @Indexed(name = "testId_idx", background = true)
     private String testId;
     private String clientEmail;
     private SubmissionStatus status;

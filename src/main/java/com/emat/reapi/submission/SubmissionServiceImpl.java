@@ -61,23 +61,34 @@ class SubmissionServiceImpl implements SubmissionService {
     public Mono<Submission> updateSubmission(SubmissionUpdateDto request, String submissionId) {
         return submissionRepository.findBySubmissionId(submissionId)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("Can't find submissionId: " + submissionId)))
-                .map(document -> {
+                .flatMap(document -> {
+                            if (document.getStatus() == SubmissionStatus.DONE) {
+                                return Mono.error(
+                                        new SubmissionStateException(
+                                                "Can't update submission Id: " + submissionId + " because test is already done!",
+                                                SubmissionException.SubmissionErrorType.SUBMISSION_UPDATE_ERROR
+                                        )
+                                );
+                            }
                             document.setClientName(request.clientName());
                             document.setTestId(request.testId());
                             document.setDurationDays(request.durationDays());
                             document.setExpireAt(Instant.now().plusSeconds(convertDaysToSeconds(request.durationDays())));
-                            return document;
+                            return submissionRepository.save(document);
                         }
                 )
-                .flatMap(submissionRepository::save)
                 .map(SubmissionDocument::toDomain)
                 .doOnSuccess(suc -> log.info("Submission ID: {} updated successful", submissionId))
                 .onErrorMap(e -> {
                     log.error("Error updating submission ID: {}", submissionId, e);
-                    return new SubmissionException(
-                            "Failed to create submission",
-                            e,
-                            SubmissionException.SubmissionErrorType.SUBMISSION_UPDATE_ERROR);
+                    if (e instanceof SubmissionStateException) {
+                        return e;
+                    } else {
+                        return new SubmissionException(
+                                "Failed to create submission",
+                                e,
+                                SubmissionException.SubmissionErrorType.SUBMISSION_UPDATE_ERROR);
+                    }
                 });
 
     }
@@ -94,7 +105,19 @@ class SubmissionServiceImpl implements SubmissionService {
 
     @Override
     public Mono<Void> deleteSubmission(String submissionId) {
-        return submissionRepository.deleteBySubmissionId(submissionId)
+        return submissionRepository.findBySubmissionId(submissionId)
+                .flatMap(submissionDocument -> {
+                    if (submissionDocument.getStatus() == SubmissionStatus.DONE) {
+                        return Mono.error(
+                                new SubmissionStateException(
+                                        "Can't delete submission Id: " + submissionId + " because test is already done!",
+                                        SubmissionException.SubmissionErrorType.SUBMISSION_DELETE_ERROR
+                                )
+                        );
+                    } else {
+                        return submissionRepository.deleteBySubmissionId(submissionId);
+                    }
+                })
                 .doOnError(e -> {
                     log.error("Can't delete submissionID: {}", submissionId, e);
                 });
@@ -118,5 +141,14 @@ class SubmissionServiceImpl implements SubmissionService {
                             e,
                             SubmissionException.SubmissionErrorType.SUBMISSION_UPDATE_ERROR);
                 });
+    }
+
+    public Mono<Boolean> existsByTestId(String testId) {
+        return submissionRepository.existsByTestId(testId);
+    }
+
+    public Flux<Submission> findAllByTestId(String testId) {
+        return submissionRepository.findAllByTestId(testId)
+                .map(SubmissionDocument::toDomain);
     }
 }

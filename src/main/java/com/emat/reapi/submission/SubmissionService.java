@@ -12,4 +12,6 @@ public interface SubmissionService {
     Flux<Submission> findAllByOrderByCreatedAtDesc();
     Mono<Void> deleteSubmission(String submissionId);
     Mono<Submission> closeSubmission(String submissionId);
+    Mono<Boolean> existsByTestId(String testId);
+    Flux<Submission> findAllByTestId(String testId);
 }

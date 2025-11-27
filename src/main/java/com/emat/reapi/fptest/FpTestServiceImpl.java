@@ -1,6 +1,7 @@
 package com.emat.reapi.fptest;
 
 import com.emat.reapi.api.dto.fptestdto.FpTestDto;
+import com.emat.reapi.api.dto.fptestdto.FpTestResponse;
 import com.emat.reapi.fptest.domain.FpTest;
 import com.emat.reapi.fptest.domain.FpTestStatement;
 import com.emat.reapi.fptest.infra.FpTestDocument;
@@ -8,6 +9,8 @@ import com.emat.reapi.fptest.infra.FpTestRepository;
 import com.emat.reapi.fptest.infra.FpTestStatementDocument;
 import com.emat.reapi.statement.domain.StatementDefinition;
 import com.emat.reapi.statement.port.StatementDefinitionService;
+import com.emat.reapi.submission.Submission;
+import com.emat.reapi.submission.SubmissionService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -24,11 +28,12 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Slf4j
 class FpTestServiceImpl implements FpTestService {
-    private FpTestRepository fpTestRepository;
-    private StatementDefinitionService statementDefinitionService;
+    private final FpTestRepository fpTestRepository;
+    private final StatementDefinitionService statementDefinitionService;
+    private final SubmissionService submissionService;
 
     @Override
-    public Mono<FpTest> createFpTest(FpTestDto fpTestDto) {
+    public Mono<FpTestResponse> createFpTest(FpTestDto fpTestDto) {
         var testId = "fpt_" + UUID.randomUUID().toString();
         return buildFpTestStatements(fpTestDto.statementKeys())
                 .flatMap(fpTestStatementDocuments -> {
@@ -44,13 +49,13 @@ class FpTestServiceImpl implements FpTestService {
                             );
                             return fpTestRepository
                                     .save(FpTestDocument.fromDomain(domain))
-                                    .map(FpTestDocument::toDomain);
+                                    .flatMap(doc -> mapToResponseWithSubmissions(doc.toDomain()));
                         }
                 );
     }
 
     @Override
-    public Mono<FpTest> updateFpTest(FpTestDto fpTestDto) {
+    public Mono<FpTestResponse> updateFpTest(FpTestDto fpTestDto) {
         if (fpTestDto.testId() == null || fpTestDto.testId().isBlank()) {
             return Mono.error(new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
@@ -69,26 +74,50 @@ class FpTestServiceImpl implements FpTestService {
                     existing.setTestName(fpTestDto.testName());
                     existing.setDescriptionBefore(fpTestDto.descriptionBefore());
                     existing.setDescriptionAfter(fpTestDto.descriptionAfter());
-                    existing.setFpTestStatementDocuments(FpTestStatementDocument.fromDomainlist(fpTestStatements));
-                    return fpTestRepository.save(existing);
+
+                    return submissionService.existsByTestId(existing.getTestId())
+                            .flatMap(isSubmission -> {
+                                List<String> currentStatements = existing.getFpTestStatementDocuments()
+                                        .stream()
+                                        .map(FpTestStatementDocument::statementKey)
+                                        .toList();
+                                if (!areStatementsTheSame(fpTestDto.statementKeys(), currentStatements) && isSubmission) {
+                                    return Mono.error(new FpTestStateException(
+                                            "Can't update statements in test with ID: " + existing.getTestId() + " because is already submitted!",
+                                            FpTestStateException.FpTestErrorType.FP_TEST_EDIT_ERROR
+                                    ));
+                                }
+                                existing.setFpTestStatementDocuments(FpTestStatementDocument.fromDomainlist(fpTestStatements));
+                                return fpTestRepository.save(existing);
+                            });
                 })
-                .map(FpTestDocument::toDomain);
+                .flatMap(doc -> mapToResponseWithSubmissions(doc.toDomain()));
     }
 
     @Override
-    public Flux<FpTest> findAll() {
+    public Flux<FpTestResponse> findAll() {
         return fpTestRepository.findAll()
-                .map(FpTestDocument::toDomain);
+                .map(FpTestDocument::toDomain)
+                .flatMap(this::mapToResponseWithSubmissions);
+    }
+
+    private Mono<FpTestResponse> mapToResponseWithSubmissions(FpTest fpTest) {
+        return submissionService.findAllByTestId(fpTest.testId())
+                .collectList()
+                .map(list -> {
+                    var submissionIds = list.stream().map(Submission::submissionId).toList();
+                    return FpTestResponse.toResponse(fpTest, submissionIds);
+                });
     }
 
     @Override
-    public Mono<FpTest> findFpTestByTestId(String testId) {
+    public Mono<FpTestResponse> findFpTestByTestId(String testId) {
         return fpTestRepository.findByTestId(testId)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "Test with testId=" + testId + " not found"
                 )))
-                .map(FpTestDocument::toDomain);
+                .flatMap(doc -> mapToResponseWithSubmissions(doc.toDomain()));
     }
 
     @Override
@@ -98,13 +127,26 @@ class FpTestServiceImpl implements FpTestService {
                         HttpStatus.NOT_FOUND,
                         "Test with testId=" + testId + " not found"
                 )))
-                .flatMap(doc -> fpTestRepository.deleteByTestId(testId));
+                .flatMap(doc -> submissionService.existsByTestId(testId))
+                .flatMap(isSubmission -> {
+                    if (isSubmission) {
+                        return Mono.error(new FpTestStateException(
+                                "Can't delete test Id: " + testId + " because is already submitted",
+                                FpTestStateException.FpTestErrorType.FP_TEST_DELETE_ERROR));
+                    }
+                    return fpTestRepository.deleteByTestId(testId);
+                });
     }
 
     @Override
     public Flux<FpTestStatement> getAllTestStatements() {
         return statementDefinitionService.getAllStatementDefinitions()
                 .map(FpTestStatement::formStatementDefinition);
+    }
+
+    private boolean areStatementsTheSame(List<String> newStatementKeys, List<String> currentStatementKeys) {
+        return new HashSet<>(currentStatementKeys).containsAll(newStatementKeys)
+                && currentStatementKeys.size() == newStatementKeys.size();
     }
 
     private Mono<List<FpTestStatement>> buildFpTestStatements(List<String> statementKeys) {

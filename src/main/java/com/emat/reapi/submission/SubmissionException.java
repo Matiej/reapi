@@ -6,8 +6,8 @@ import lombok.Getter;
 public class SubmissionException extends Throwable {
     private final SubmissionErrorType type;
 
-    public SubmissionException(String message, Throwable e, SubmissionErrorType errorType) {
-        super(message);
+    public SubmissionException(String message, Throwable cause, SubmissionErrorType errorType) {
+        super(message, cause);
         this.type = errorType;
     }
 
@@ -19,7 +19,8 @@ public class SubmissionException extends Throwable {
     public enum SubmissionErrorType {
         SUBMISSION_CREATE_ERROR,
         SUBMISSION_UPDATE_ERROR,
-        SUBMISSION_NOT_FOUND
+        SUBMISSION_NOT_FOUND,
+        SUBMISSION_DELETE_ERROR
     }
 }
 

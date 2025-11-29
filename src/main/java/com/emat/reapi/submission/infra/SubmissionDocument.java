@@ -1,5 +1,7 @@
-package com.emat.reapi.submission;
+package com.emat.reapi.submission.infra;
 
+import com.emat.reapi.submission.domain.Submission;
+import com.emat.reapi.submission.domain.SubmissionStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

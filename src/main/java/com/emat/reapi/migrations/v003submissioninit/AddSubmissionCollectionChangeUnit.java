@@ -1,7 +1,7 @@
 package com.emat.reapi.migrations.v003submissioninit;
 
 import com.emat.reapi.migrations.CollectionInitializer;
-import com.emat.reapi.submission.SubmissionDocument;
+import com.emat.reapi.submission.infra.SubmissionDocument;
 import io.mongock.api.annotations.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -2,6 +2,10 @@ package com.emat.reapi.submission;
 
 import com.emat.reapi.api.dto.SubmissionDto;
 import com.emat.reapi.api.dto.SubmissionUpdateDto;
+import com.emat.reapi.submission.domain.Submission;
+import com.emat.reapi.submission.domain.SubmissionStatus;
+import com.emat.reapi.submission.infra.SubmissionDocument;
+import com.emat.reapi.submission.infra.SubmissionRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -150,5 +154,16 @@ class SubmissionServiceImpl implements SubmissionService {
     public Flux<Submission> findAllByTestId(String testId) {
         return submissionRepository.findAllByTestId(testId)
                 .map(SubmissionDocument::toDomain);
+    }
+
+    @Override
+    public Mono<Submission> findByPublicTokenAndStatus(String publicToken, SubmissionStatus status) {
+        return submissionRepository.findByPublicTokenAndStatus(publicToken, status)
+                .map(SubmissionDocument::toDomain)
+                .doOnSuccess(suc -> log.info("Found submissions for public token: {}, with status: {}",
+                                publicToken,
+                                status.name()
+                        )
+                );
     }
 }

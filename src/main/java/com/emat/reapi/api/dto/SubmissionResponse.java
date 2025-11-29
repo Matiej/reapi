@@ -1,7 +1,7 @@
 package com.emat.reapi.api.dto;
 
-import com.emat.reapi.submission.Submission;
-import com.emat.reapi.submission.SubmissionStatus;
+import com.emat.reapi.submission.domain.Submission;
+import com.emat.reapi.submission.domain.SubmissionStatus;
 
 import java.time.Duration;
 import java.time.Instant;

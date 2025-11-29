@@ -9,7 +9,7 @@ import com.emat.reapi.fptest.infra.FpTestRepository;
 import com.emat.reapi.fptest.infra.FpTestStatementDocument;
 import com.emat.reapi.statement.domain.StatementDefinition;
 import com.emat.reapi.statement.port.StatementDefinitionService;
-import com.emat.reapi.submission.Submission;
+import com.emat.reapi.submission.domain.Submission;
 import com.emat.reapi.submission.SubmissionService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -142,6 +142,12 @@ class FpTestServiceImpl implements FpTestService {
     public Flux<FpTestStatement> getAllTestStatements() {
         return statementDefinitionService.getAllStatementDefinitions()
                 .map(FpTestStatement::formStatementDefinition);
+    }
+
+    @Override
+    public Mono<FpTest> getFpTesByTestId(String testId) {
+        return fpTestRepository.findByTestId(testId)
+                .map(FpTestDocument::toDomain);
     }
 
     private boolean areStatementsTheSame(List<String> newStatementKeys, List<String> currentStatementKeys) {

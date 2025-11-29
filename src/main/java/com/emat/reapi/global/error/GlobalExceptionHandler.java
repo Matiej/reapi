@@ -1,5 +1,6 @@
 package com.emat.reapi.global.error;
 
+import com.emat.reapi.clienttest.ClientTestException;
 import com.emat.reapi.fptest.FpTestStateException;
 import com.emat.reapi.submission.SubmissionException;
 import com.emat.reapi.submission.SubmissionStateException;
@@ -19,6 +20,21 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ClientTestException.class)
+    public ResponseEntity<ErrorResponse> clientTEstException(ClientTestException ex, ServerHttpRequest request) {
+        log.warn("SubmissionException: {}", ex.getMessage(), ex);
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorResponse errorResponse = ErrorResponse.of(
+                status.value(),
+                status.getReasonPhrase(),
+                "CLIENT_TEST_ERROR",
+                ex.getMessage(),
+                request.getPath().value(),
+                null
+        );
+        return ResponseEntity.status(status).body(errorResponse);
+    }
 
     @ExceptionHandler(SubmissionException.class)
     public ResponseEntity<ErrorResponse> handleSubmissionException(SubmissionException ex, ServerHttpRequest request) {

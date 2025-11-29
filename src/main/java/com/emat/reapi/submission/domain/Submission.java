@@ -1,4 +1,4 @@
-package com.emat.reapi.submission;
+package com.emat.reapi.submission.domain;
 
 import java.time.Instant;
 

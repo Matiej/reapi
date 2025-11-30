@@ -41,15 +41,10 @@ public class ClientTestServiceImpl implements ClientTestService {
     @Override
     public Mono<ClientTest> getClientTestByToken(String publicToken) {
         return submissionService.findByPublicTokenAndStatus(publicToken, SubmissionStatus.OPEN)
-                .switchIfEmpty(
-                        Mono.defer(() -> {
-                                    log.warn("Can't find open submission for publicToken: {}", publicToken);
-                                    return Mono.error(new ClientTestException(
-                                                    "Can't find open submission for publicToken: " + publicToken,
-                                                    HttpStatus.NOT_FOUND
-                                            )
-                                    );
-                                }
+                .switchIfEmpty(Mono.error(new ClientTestException(
+                                        "Can't find open submission for publicToken: " + publicToken,
+                                        HttpStatus.NOT_FOUND
+                                )
                         )
                 ).flatMap(sub -> Mono.zip(
                         Mono.just(sub),
@@ -82,7 +77,7 @@ public class ClientTestServiceImpl implements ClientTestService {
                                         clientTestQuestions
                                 );
                             });
-                });
+                }));
     }
 
     @Override

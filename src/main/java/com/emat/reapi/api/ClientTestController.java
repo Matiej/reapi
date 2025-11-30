@@ -1,17 +1,18 @@
 package com.emat.reapi.api;
 
+import com.emat.reapi.api.dto.ClientAnswerDto;
 import com.emat.reapi.api.dto.clienttestdto.ClientTestDto;
-import com.emat.reapi.api.dto.fptestdto.FpTestResponse;
+import com.emat.reapi.api.dto.clienttestdto.ClientTestSubmissionDto;
 import com.emat.reapi.clienttest.ClientTestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -23,6 +24,24 @@ import reactor.core.publisher.Mono;
 public class ClientTestController {
     private final ClientTestService clientTestService;
 
+    @PostMapping()
+    @Operation(
+            summary = "Save client test",
+            description = "Save client test",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Client test saved successful"),
+                    @ApiResponse(responseCode = "400", description = "Invalid public token ")
+            }
+    )
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<Void> saveTest(
+            @Valid @RequestBody ClientTestSubmissionDto request
+    ) {
+        log.info("Received request: POST '/api/pftest' to retrieve all tests");
+        return clientTestService.saveClientTest(request);
+
+    }
+
     @GetMapping("/{publicToken}")
     @Operation(
             summary = "Get client test",
@@ -33,10 +52,10 @@ public class ClientTestController {
             }
     )
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ClientTestDto> getAllTests(
+    public Mono<ClientTestDto> getClientTest(
             @PathVariable String publicToken
     ) {
-        log.info("Received request: GET '/api/pftest' to retrieve all tests");
+        log.info("Received request: GET '/api/client/test' to retrieve client test fo token: {}", publicToken);
         return clientTestService.getClientTestByToken(publicToken)
                 .map(ClientTestDto::fromDomain);
     }

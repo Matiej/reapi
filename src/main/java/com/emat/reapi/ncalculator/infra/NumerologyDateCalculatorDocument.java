@@ -3,9 +3,10 @@ package com.emat.reapi.ncalculator.infra;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.TypeAlias;
+import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.Instant;
 
 @Data
 @AllArgsConstructor
@@ -27,5 +28,23 @@ public class NumerologyDateCalculatorDocument {
     private int personalMonth;
     private int worldDayVibration;
     private int personalDay;
+    @CreatedDate
+    private Instant createdAt;
+    @LastModifiedDate
+    private Instant updatedAt;
+    @Version
+    private Long version;
+
+    public NumerologyDateCalculatorDocument(String requestedBrithDate, String requestedReferenceDate, String mainVibration, int personalYear, int yearOfGlobalEnergy, int numerologyYear, int personalMonth, int worldDayVibration, int personalDay) {
+        this.requestedBrithDate = requestedBrithDate;
+        this.requestedReferenceDate = requestedReferenceDate;
+        this.mainVibration = mainVibration;
+        this.personalYear = personalYear;
+        this.yearOfGlobalEnergy = yearOfGlobalEnergy;
+        this.numerologyYear = numerologyYear;
+        this.personalMonth = personalMonth;
+        this.worldDayVibration = worldDayVibration;
+        this.personalDay = personalDay;
+    }
 }
 

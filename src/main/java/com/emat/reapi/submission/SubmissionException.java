@@ -3,7 +3,7 @@ package com.emat.reapi.submission;
 import lombok.Getter;
 
 @Getter
-public class SubmissionException extends Throwable {
+public class SubmissionException extends RuntimeException {
     private final SubmissionErrorType type;
 
     public SubmissionException(String message, Throwable cause, SubmissionErrorType errorType) {

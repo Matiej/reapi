@@ -1,6 +1,6 @@
 package com.emat.reapi.fptest;
 
-public class FpTestStateException extends Throwable {
+public class FpTestStateException extends RuntimeException {
     private final FpTestStateException.FpTestErrorType type;
 
     public FpTestStateException(String message, Throwable cause, FpTestErrorType type) {

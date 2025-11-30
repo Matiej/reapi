@@ -26,7 +26,7 @@ public class NumerologyPhaseCalculatorDocument {
     @CreatedDate
     private Instant createdAt;
     @LastModifiedDate
-    Instant updatedAt;
+    private Instant updatedAt;
     @Version
-    Long version;
+    private Long version;
 }

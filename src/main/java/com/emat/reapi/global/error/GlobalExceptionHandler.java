@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ClientTestException.class)
     public ResponseEntity<ErrorResponse> clientTEstException(ClientTestException ex, ServerHttpRequest request) {
         log.warn("SubmissionException: {}", ex.getMessage(), ex);
-        HttpStatus status = HttpStatus.BAD_REQUEST;
+        HttpStatus status = ex.getStatus();
         ErrorResponse errorResponse = ErrorResponse.of(
                 status.value(),
                 status.getReasonPhrase(),

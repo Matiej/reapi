@@ -166,7 +166,6 @@ public class NCalculatorServiceImpl implements NCalculatorService {
         );
 
         NumerologyDateCalculatorDocument document = new NumerologyDateCalculatorDocument(
-                null,
                 birthDate,
                 reference.toString(),
                 mainVibration,

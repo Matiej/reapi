@@ -13,7 +13,7 @@ public record ClientTestSubmissionDto(
 
         @NotBlank(message = "Field pubicToken can't be empty!")
         @Size(max = 255, message = "To long pubicToken. Maximum size of pubicToken filed is 255 characters.")
-        String pubicToken,
+        String publicToken,
 
         @NotEmpty(message = "Client answers list can't be empty")
         List<ClientTestAnswerDto> clientTestAnswers

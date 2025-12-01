@@ -4,7 +4,7 @@ import com.emat.reapi.statement.domain.StatementCategory;
 
 public record ClientTestQuestion(
         String id,
-        String questionKey,
+        String statementKey,
         StatementCategory statementCategory,
         String supportingStatement,
         String limitingStatement

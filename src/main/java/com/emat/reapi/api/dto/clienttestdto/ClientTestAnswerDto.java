@@ -1,7 +1,7 @@
 package com.emat.reapi.api.dto.clienttestdto;
 
 public record ClientTestAnswerDto(
-        String questionKey,
+        String statementKey,
         int scoring
 ) {
 }

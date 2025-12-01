@@ -30,7 +30,7 @@ public record ClientTestDto(
                 .map(question ->
                         new ClientQuestionDto(
                                 question.id(),
-                                question.questionKey(),
+                                question.statementKey(),
                                 question.statementCategory().getPlName(),
                                 question.supportingStatement(),
                                 question.limitingStatement()

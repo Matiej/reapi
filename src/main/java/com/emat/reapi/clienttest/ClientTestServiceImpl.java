@@ -18,14 +18,13 @@ import com.emat.reapi.submission.SubmissionService;
 import com.emat.reapi.submission.domain.Submission;
 import com.emat.reapi.submission.domain.SubmissionStatus;
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.Collection;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,7 +39,7 @@ public class ClientTestServiceImpl implements ClientTestService {
 
     @Override
     public Mono<ClientTest> getClientTestByToken(String publicToken) {
-        return submissionService.findByPublicTokenAndStatus(publicToken, SubmissionStatus.OPEN)
+        return submissionService.findByPublicTokenAndStatusAndExpireAtAfter(publicToken, SubmissionStatus.OPEN, Instant.now())
                 .switchIfEmpty(Mono.error(new ClientTestException(
                                         "Can't find open submission for publicToken: " + publicToken,
                                         HttpStatus.NOT_FOUND
@@ -84,7 +83,7 @@ public class ClientTestServiceImpl implements ClientTestService {
     public Mono<Void> saveClientTest(ClientTestSubmissionDto request) {
         return submissionService.findBySubmissionId(request.submissionId())
                 .flatMap(sub -> {
-                    if (!sub.publicToken().equals(request.pubicToken())) {
+                    if (!sub.publicToken().equals(request.publicToken())) {
                         return Mono.error(new ClientTestException(
                                 "Public token does not match submission",
                                 HttpStatus.BAD_REQUEST
@@ -116,24 +115,25 @@ public class ClientTestServiceImpl implements ClientTestService {
                             submission.publicToken(),
                             request.clientTestAnswers()
                                     .stream()
-                                    .map(ans -> new ClientTestAnswer(ans.questionKey(), ans.scoring()))
+                                    .map(ans -> new ClientTestAnswer(ans.statementKey(), ans.scoring()))
                                     .toList()
                     );
                     ClientTestDocument clientTestDocument = ClientTestDocument.fromDomain(clientTestSubmission, statementDefinitions);
                     return clientTestRepository.save(clientTestDocument)
                             .onErrorMap(err -> {
                                 if (err instanceof DuplicateKeyException) {
-                                    throw new ClientTestException(
+                                    return new ClientTestException(
                                             "Can't save client test for submissionId: " + submission.submissionId() + " - already exists",
                                             HttpStatus.CONFLICT,
                                             err);
                                 } else {
-                                    throw new ClientTestException(
+                                    return new ClientTestException(
                                             "Can't save client test for submissionId: " + submission.submissionId(),
                                             HttpStatus.INTERNAL_SERVER_ERROR,
                                             err);
                                 }
-                            });
+                            })
+                            .then(submissionService.closeSubmission(submission.submissionId()));
                 }).doOnError(ex -> log.error("Error saving client test answers"))
                 .doOnSuccess(suc -> log.info("Saved '{}' client answers for submission '{}'",
                         request.clientTestAnswers().size(),
@@ -147,7 +147,7 @@ public class ClientTestServiceImpl implements ClientTestService {
                 .toList();
         var missing = answers
                 .stream()
-                .map(ClientTestAnswerDto::questionKey)
+                .map(ClientTestAnswerDto::statementKey)
                 .filter(p -> !keys.contains(p))
                 .toList();
 

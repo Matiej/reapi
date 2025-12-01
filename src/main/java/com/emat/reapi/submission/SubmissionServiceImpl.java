@@ -166,4 +166,16 @@ class SubmissionServiceImpl implements SubmissionService {
                         )
                 );
     }
+
+    @Override
+    public Mono<Submission> findByPublicTokenAndStatusAndExpireAtAfter(String publicToken, SubmissionStatus status, Instant now) {
+        return submissionRepository
+                .findByPublicTokenAndStatusAndExpireAtAfter(publicToken, status, now)
+                .map(SubmissionDocument::toDomain)
+                .doOnSuccess(suc -> log.info("Found submissions for public token: {}, with status: {}",
+                                publicToken,
+                                status.name()
+                        )
+                );
+    }
 }

@@ -1,6 +1,5 @@
 package com.emat.reapi.api;
 
-import com.emat.reapi.api.dto.ClientAnswerDto;
 import com.emat.reapi.api.dto.clienttestdto.ClientTestDto;
 import com.emat.reapi.api.dto.clienttestdto.ClientTestSubmissionDto;
 import com.emat.reapi.clienttest.ClientTestService;

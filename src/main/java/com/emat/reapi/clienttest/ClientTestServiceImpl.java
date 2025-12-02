@@ -6,6 +6,7 @@ import com.emat.reapi.clienttest.domain.ClientTest;
 import com.emat.reapi.clienttest.domain.ClientTestAnswer;
 import com.emat.reapi.clienttest.domain.ClientTestQuestion;
 import com.emat.reapi.clienttest.domain.ClientTestSubmission;
+import com.emat.reapi.clienttest.infra.ClientTestAnswerDocument;
 import com.emat.reapi.clienttest.infra.ClientTestDocument;
 import com.emat.reapi.clienttest.infra.ClientTestRepository;
 import com.emat.reapi.fptest.FpTestService;
@@ -27,6 +28,10 @@ import reactor.core.publisher.Mono;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static com.emat.reapi.statement.domain.StatementType.LIMITING;
+import static com.emat.reapi.statement.domain.StatementType.SUPPORTING;
 
 @Slf4j
 @AllArgsConstructor
@@ -102,6 +107,7 @@ public class ClientTestServiceImpl implements ClientTestService {
                         return Mono.error(new ClientTestException("Number of client test are different than in submitted test", HttpStatus.BAD_REQUEST));
                     }
 
+
                     String testSubmissionPublicId = "tsb_" + UUID.randomUUID();
                     ClientTestSubmission clientTestSubmission = new ClientTestSubmission(
                             testSubmissionPublicId,
@@ -113,12 +119,9 @@ public class ClientTestServiceImpl implements ClientTestService {
                             fpTest.testId(),
                             fpTest.testName(),
                             submission.publicToken(),
-                            request.clientTestAnswers()
-                                    .stream()
-                                    .map(ans -> new ClientTestAnswer(ans.statementKey(), ans.scoring()))
-                                    .toList()
+                            mapToDomain(statementDefinitions, request.clientTestAnswers())
                     );
-                    ClientTestDocument clientTestDocument = ClientTestDocument.fromDomain(clientTestSubmission, statementDefinitions);
+                    ClientTestDocument clientTestDocument = ClientTestDocument.fromDomain(clientTestSubmission);
                     return clientTestRepository.save(clientTestDocument)
                             .onErrorMap(err -> {
                                 if (err instanceof DuplicateKeyException) {
@@ -139,6 +142,36 @@ public class ClientTestServiceImpl implements ClientTestService {
                         request.clientTestAnswers().size(),
                         request.submissionId()))
                 .then();
+    }
+
+    private List<ClientTestAnswer> mapToDomain(List<StatementDefinition> statementDefinitions, List<ClientTestAnswerDto> clientTestAnswers) {
+        var definitionByKey = statementDefinitions.stream()
+                .collect(Collectors.toMap(
+                        StatementDefinition::getStatementKey,
+                        d -> d
+                ));
+
+        return clientTestAnswers.stream()
+                .map(answerDto -> {
+                    String statementKey = answerDto.statementKey();
+                    StatementDefinition statementDefinition = definitionByKey.get(statementKey);
+                    return new ClientTestAnswer(
+                            statementKey,
+                            statementDefinition.getCategory(),
+                            mapToDefinition(statementDefinition.getStatementTypeDefinitions(), LIMITING),
+                            mapToDefinition(statementDefinition.getStatementTypeDefinitions(), SUPPORTING),
+                            answerDto.scoring()
+                    );
+                }).toList();
+
+    }
+
+    private String mapToDefinition(List<StatementTypeDefinition> statementTypeDefinitions, StatementType type) {
+        return statementTypeDefinitions.stream()
+                .filter(d -> d.getStatementType() == type)
+                .findFirst()
+                .map(StatementTypeDefinition::getStatementDescription)
+                .orElseThrow();
     }
 
     private Mono<Void> validateQuestions(List<ClientTestAnswerDto> answers, List<StatementDefinition> definitions) {

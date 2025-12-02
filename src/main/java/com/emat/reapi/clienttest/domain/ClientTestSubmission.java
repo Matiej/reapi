@@ -22,6 +22,7 @@ public class ClientTestSubmission {
     private String testName;
     private String publicToken;
     private List<ClientTestAnswer> clientTestAnswerList;
+    private Instant createdAt;
 
     public ClientTestSubmission(String testSubmissionPublicId, String clientId, String clientName, String clientEmail, String submissionId, Instant submissionDate, String testId, String testName, String publicToken, List<ClientTestAnswer> clientTestAnswerList) {
         this.testSubmissionPublicId = testSubmissionPublicId;
@@ -35,4 +36,6 @@ public class ClientTestSubmission {
         this.publicToken = publicToken;
         this.clientTestAnswerList = clientTestAnswerList;
     }
+
+
 }

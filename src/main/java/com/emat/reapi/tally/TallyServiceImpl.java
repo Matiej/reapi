@@ -2,7 +2,7 @@ package com.emat.reapi.tally;
 
 import com.emat.reapi.api.dto.ClientAnswerDto;
 import com.emat.reapi.api.tally.TallyWebhookEvent;
-import com.emat.reapi.statement.port.ClientAnswerService;
+import com.emat.reapi.clienttalytest.ClientAnswerService;
 import com.emat.reapi.statement.port.StatementDefinitionService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

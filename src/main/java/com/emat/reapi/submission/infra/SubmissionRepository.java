@@ -7,7 +7,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
-import java.util.Optional;
 
 @Repository
 public interface SubmissionRepository extends ReactiveMongoRepository<SubmissionDocument, String> {

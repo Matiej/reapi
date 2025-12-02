@@ -1,6 +1,6 @@
 package com.emat.reapi.statement.infra;
 
-import com.emat.reapi.statement.domain.ClientStatement;
+import com.emat.reapi.clienttalytest.domain.ClientStatement;
 import com.emat.reapi.statement.domain.StatementCategory;
 import lombok.AllArgsConstructor;
 import lombok.Data;

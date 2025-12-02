@@ -1,7 +1,7 @@
 package com.emat.reapi.ai.port;
 
-import com.emat.reapi.profiler.domain.MinimizedPayload;
-import com.emat.reapi.profiler.domain.report.InsightReportAiResponse;
+import com.emat.reapi.profileanalysis.domain.MinimizedPayload;
+import com.emat.reapi.profileanalysis.domain.InsightReportAiResponse;
 import reactor.core.publisher.Mono;
 
 public interface AiInsightAnalyzerService {

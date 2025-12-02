@@ -1,6 +1,6 @@
 package com.emat.reapi.api.dto.InsightReportDto;
 
-import com.emat.reapi.profiler.domain.report.PayloadMode;
+import com.emat.reapi.profileanalysis.domain.PayloadMode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.Instant;

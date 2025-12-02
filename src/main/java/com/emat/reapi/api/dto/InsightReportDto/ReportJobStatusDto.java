@@ -1,7 +1,7 @@
 package com.emat.reapi.api.dto.InsightReportDto;
 
-import com.emat.reapi.profiler.domain.reportjob.ReportJob;
-import com.emat.reapi.profiler.domain.reportjob.ReportJobStatus;
+import com.emat.reapi.profileanalysis.domain.reportjob.ReportJob;
+import com.emat.reapi.profileanalysis.domain.reportjob.ReportJobStatus;
 
 import java.time.Duration;
 import java.time.Instant;

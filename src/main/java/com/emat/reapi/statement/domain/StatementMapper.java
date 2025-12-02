@@ -4,6 +4,7 @@ import com.emat.reapi.api.dto.AnsweredStatementDto;
 import com.emat.reapi.api.dto.AnsweredStatementResponse;
 import com.emat.reapi.api.dto.StatementDto;
 import com.emat.reapi.api.dto.StatementResponse;
+import com.emat.reapi.clienttalytest.domain.ClientStatement;
 
 import java.util.List;
 

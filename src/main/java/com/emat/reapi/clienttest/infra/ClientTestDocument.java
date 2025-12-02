@@ -46,6 +46,7 @@ public class ClientTestDocument {
 
     public ClientTestSubmission toDomain() {
         return new ClientTestSubmission(
+                id,
                 testSubmissionPublicId,
                 clientId,
                 clientName,
@@ -55,23 +56,22 @@ public class ClientTestDocument {
                 testId,
                 testName,
                 publicToken,
-                answers.stream().map(ClientTestAnswerDocument::toDomain).toList()
+                answers.stream().map(ClientTestAnswerDocument::toDomain).toList(),
+                createdAt
         );
     }
 
     public static ClientTestDocument fromDomain(
-            ClientTestSubmission submission,
-            List<StatementDefinition> statementDefinitions
+            ClientTestSubmission submission
     ) {
-        var definitionByKey = statementDefinitions.stream()
-                .collect(Collectors.toMap(
-                        StatementDefinition::getStatementKey,
-                        d -> d
-                ));
-
         var answerDocs = submission.getClientTestAnswerList().stream()
-                .map(a -> ClientTestAnswerDocument.fromDomain(a, definitionByKey.get(a.questionKey())))
-                .toList();
+                .map(a -> new ClientTestAnswerDocument(
+                        a.statementKey(),
+                        a.category(),
+                        a.limitingDescription(),
+                        a.supportingDescription(),
+                        a.scoring()
+                )).toList();
 
         ClientTestDocument clientTestDocument = new ClientTestDocument();
         clientTestDocument.setId(submission.getId());

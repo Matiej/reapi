@@ -1,6 +1,6 @@
 package com.emat.reapi.api.dto.InsightReportDto;
 
-import com.emat.reapi.profiler.domain.report.*;
+import com.emat.reapi.profileanalysis.domain.*;
 
 public class InsightReportMapper {
     private InsightReportMapper() {

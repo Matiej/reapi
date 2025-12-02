@@ -1,7 +1,7 @@
 package com.emat.reapi.api;
 
 import com.emat.reapi.api.dto.ClientAnswerResponse;
-import com.emat.reapi.statement.port.ClientAnswerService;
+import com.emat.reapi.clienttalytest.ClientAnswerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

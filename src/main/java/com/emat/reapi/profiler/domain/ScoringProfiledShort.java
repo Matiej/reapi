@@ -6,6 +6,7 @@ public record ScoringProfiledShort(
         String testSubmissionPublicId,
         String clientName,
         String clientId,
+        Instant clientTestDate,
         String submissionId,
         Instant submissionDate,
         String testName,

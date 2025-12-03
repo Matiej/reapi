@@ -135,6 +135,7 @@ public class ProfiledScoringTestServiceImpl implements ProfiledScoringTestServic
                 clientTestSubmission.getTestSubmissionPublicId(),
                 clientTestSubmission.getClientName(),
                 clientTestSubmission.getClientId(),
+                clientTestSubmission.getCreatedAt(),
                 clientTestSubmission.getSubmissionId(),
                 clientTestSubmission.getSubmissionDate(),
                 clientTestSubmission.getTestName(),

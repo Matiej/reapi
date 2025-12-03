@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/publish")
-public class SubController {
-    private static final Logger log = LoggerFactory.getLogger(SubController.class);
+@RequestMapping("/api/appdata")
+public class AppDataController {
+    private static final Logger log = LoggerFactory.getLogger(AppDataController.class);
     private final ApplicationData applicationData;
 
-    public SubController(ApplicationData applicationData) {
+    public AppDataController(ApplicationData applicationData) {
         this.applicationData = applicationData;
     }
 

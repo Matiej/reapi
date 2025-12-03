@@ -2,6 +2,7 @@ package com.emat.reapi.global.error;
 
 import com.emat.reapi.clienttest.ClientTestException;
 import com.emat.reapi.fptest.FpTestStateException;
+import com.emat.reapi.profiler.ProfilerException;
 import com.emat.reapi.submission.SubmissionException;
 import com.emat.reapi.submission.SubmissionStateException;
 import jakarta.validation.ConstraintViolationException;
@@ -20,6 +21,21 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ProfilerException.class)
+    public ResponseEntity<ErrorResponse> clientProfilerException(ProfilerException ex, ServerHttpRequest request) {
+        log.warn("SubmissionException: {}", ex.getMessage(), ex);
+        HttpStatus status = ex.getStatus();
+        ErrorResponse errorResponse = ErrorResponse.of(
+                status.value(),
+                status.getReasonPhrase(),
+                ex.getErrorType().name(),
+                ex.getMessage(),
+                request.getPath().value(),
+                null
+        );
+        return ResponseEntity.status(status).body(errorResponse);
+    }
 
     @ExceptionHandler(ClientTestException.class)
     public ResponseEntity<ErrorResponse> clientTEstException(ClientTestException ex, ServerHttpRequest request) {

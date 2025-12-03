@@ -6,6 +6,5 @@ import reactor.core.publisher.Mono;
 
 public interface ClientTestService {
     Mono<ClientTest> getClientTestByToken(String publicToken);
-
     Mono<Void> saveClientTest(ClientTestSubmissionDto submissionDto);
 }

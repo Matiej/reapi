@@ -1,15 +1,15 @@
 package com.emat.reapi.profiler;
 
-import com.emat.reapi.clienttest.ClientTestService;
+import com.emat.reapi.clienttest.ClientTestSubmissionService;
 import com.emat.reapi.clienttest.domain.ClientTestAnswer;
 import com.emat.reapi.clienttest.domain.ClientTestSubmission;
-import com.emat.reapi.fptest.FpTestService;
 import com.emat.reapi.profiler.domain.*;
 import com.emat.reapi.statement.domain.StatementCategory;
-import com.emat.reapi.submission.SubmissionService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Comparator;
@@ -21,26 +21,34 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class ProfiledScoringTestServiceImpl implements ProfiledScoringTestService {
-    private final ClientTestService clientTestService;
-    private final SubmissionService submissionService;
-    private final FpTestService fpTestService;
+    private final ClientTestSubmissionService clientTestSubmissionService;
 
     @Override
-    public Mono<ScoringProfiledClientDetails> getScoringProfile(String submissionId) {
-        return null;
+    public Mono<ScoringProfiledClientDetails> getScoringProfile(String testSubmissionPublicId) {
+        log.info("Retrieving ScoringProfiledClientDetails for submissionsId: {}.", testSubmissionPublicId);
+        return clientTestSubmissionService.findClientTestByTestSubmissionId(testSubmissionPublicId)
+                .switchIfEmpty(Mono.error(new ProfilerException(
+                        "Can't find clientTest for testSubmissionPublicId; {}" + testSubmissionPublicId,
+                        HttpStatus.NOT_FOUND,
+                        ProfilerException.ProfilerErrorType.GENERATE_SCORING_PROFILE_ERROR)))
+                .map(this::mapToProfile)
+                .doOnSuccess(suc -> log.info("Successful prepared ScoringProfiledClientDetails for testSubmissionPublicId: {}.", testSubmissionPublicId));
     }
 
     @Override
-    public Mono<List<ScoringProfiledShort>> getScoringShortProfiles() {
-        return null;
+    public Flux<ScoringProfiledShort> getScoringShortProfiles() {
+        log.info("Retrieving all ScoringProfiledClientShort s.");
+        log.info("Ret");
+        return clientTestSubmissionService.findAll()
+                .map(this::mapToScoringProfilerShort);
     }
 
-    private ScoringProfiledClientDetails mapToProfile(ClientTestSubmission submission) {
+    private ScoringProfiledClientDetails mapToProfile(ClientTestSubmission clientTestSubmission) {
         Map<StatementCategory, List<ClientTestAnswer>> byCategory =
-                submission.getClientTestAnswerList().stream()
+                clientTestSubmission.getClientTestAnswerList().stream()
                         .collect(Collectors.groupingBy(ClientTestAnswer::category));
 
-        ScoringOverallSummary overall = buildOverallSummary(submission.getClientTestAnswerList());
+        ScoringOverallSummary overall = buildOverallSummary(clientTestSubmission.getClientTestAnswerList());
 
         List<ScoringCategoryBlock> categories = byCategory.entrySet().stream()
                 .map(entry -> buildCategoryBlock(entry.getKey(), entry.getValue()))
@@ -48,13 +56,14 @@ public class ProfiledScoringTestServiceImpl implements ProfiledScoringTestServic
                 .toList();
 
         return new ScoringProfiledClientDetails(
-                submission.getClientName(),
-                submission.getClientId(),
-                submission.getSubmissionId(),
-                submission.getSubmissionDate(),
-                submission.getTestId(),
-                submission.getTestName(),
-                submission.getCreatedAt(),
+                clientTestSubmission.getTestSubmissionPublicId(),
+                clientTestSubmission.getClientName(),
+                clientTestSubmission.getClientId(),
+                clientTestSubmission.getSubmissionId(),
+                clientTestSubmission.getSubmissionDate(),
+                clientTestSubmission.getTestId(),
+                clientTestSubmission.getTestName(),
+                clientTestSubmission.getCreatedAt(),
                 overall,
                 categories
         );
@@ -117,6 +126,20 @@ public class ProfiledScoringTestServiceImpl implements ProfiledScoringTestServic
                 avgScore,
                 buckets,
                 pairs
+        );
+    }
+
+    private ScoringProfiledShort mapToScoringProfilerShort(ClientTestSubmission clientTestSubmission) {
+        int totalScore = buildOverallSummary(clientTestSubmission.getClientTestAnswerList()).getTotalScore();
+        return new ScoringProfiledShort(
+                clientTestSubmission.getTestSubmissionPublicId(),
+                clientTestSubmission.getClientName(),
+                clientTestSubmission.getClientId(),
+                clientTestSubmission.getSubmissionId(),
+                clientTestSubmission.getSubmissionDate(),
+                clientTestSubmission.getTestName(),
+                totalScore,
+                clientTestSubmission.getClientTestAnswerList().size()
         );
     }
 }

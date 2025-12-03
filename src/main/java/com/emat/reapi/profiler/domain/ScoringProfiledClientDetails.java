@@ -10,6 +10,7 @@ import java.util.stream.IntStream;
 @Data
 @AllArgsConstructor
 public class ScoringProfiledClientDetails {
+    private String testSubmissionPublicId;
     private String clientName;
     private String clientId;
     private String submissionId;

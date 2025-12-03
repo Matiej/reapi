@@ -3,6 +3,7 @@ package com.emat.reapi.profiler.domain;
 import java.time.Instant;
 
 public record ScoringProfiledShort(
+        String testSubmissionPublicId,
         String clientName,
         String clientId,
         String submissionId,
